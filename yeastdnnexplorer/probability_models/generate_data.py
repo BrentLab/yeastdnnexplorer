@@ -52,9 +52,9 @@ def generate_gene_population(
     shuffled_labels = labels[shuffled_indices]
 
     # Combining gene IDs and their labels
-    gene_populations = torch.stack((gene_ids, shuffled_labels), dim=1)
+    gene_population = torch.stack((gene_ids, shuffled_labels), dim=1)
 
-    return gene_populations
+    return gene_population
 
 
 def generate_perturbation_effects(
@@ -181,7 +181,7 @@ def generate_pvalues(
 
 
 def generate_perturbation_binding_data(
-    gene_populations: torch.Tensor,
+    gene_population: torch.Tensor,
     unaffected_perturbation_abs_mean: float = 0.0,
     unaffected_perturbation_std: float = 1.0,
     affected_perturbation_abs_mean: float = 3.0,
@@ -198,11 +198,11 @@ def generate_perturbation_binding_data(
     random distribution based on their effect size, with the assumption that larger
     effects are less likely to be false positives.
 
-    :param gene_populations: A tensor where the first column is the gene/feature
+    :param gene_population: A tensor where the first column is the gene/feature
         identifier and the second column is binary indicating whether the gene
         is in the signal group or not. See generate_gene_population() for
         more details.
-    :type gene_populations: torch.Tensor
+    :type gene_population: torch.Tensor
     :param unaffected_perturbation_abs_mean: The absolute mean of the
         perturbation effect for the unaffected genes. defaults to 0.0
     :type unaffected_perturbation_abs_mean: float, optional
@@ -231,7 +231,7 @@ def generate_perturbation_binding_data(
         binding_pvalue: (float) The pvalue of the binding effect
     :rtype: pd.DataFrame
 
-    :raises ValueError: If gene_populations is not a tensor with two columns
+    :raises ValueError: If gene_population is not a tensor with two columns
         where the second column is binary
     :raises ValueError: If unaffected_perturbation_abs_mean is not a float
     :raises ValueError: If unaffected_perturbation_std is not a float
@@ -242,16 +242,16 @@ def generate_perturbation_binding_data(
 
     """
     # check inputs
-    if not isinstance(gene_populations, torch.Tensor):
-        raise ValueError("gene_populations must be a tensor")
-    if gene_populations.shape[1] != 2:
-        raise ValueError("gene_populations must have two columns")
-    if gene_populations.dtype != torch.int32 and gene_populations.dtype != torch.int64:
-        raise ValueError("gene_populations must have torch.int32 or torch.int64 dtype")
-    if gene_populations.shape[0] == 0:
-        raise ValueError("gene_populations must have at least one row")
-    if not torch.all((gene_populations[:, 1] == 0) | (gene_populations[:, 1] == 1)):
-        raise ValueError("gene_populations second column must be binary")
+    if not isinstance(gene_population, torch.Tensor):
+        raise ValueError("gene_population must be a tensor")
+    if gene_population.shape[1] != 2:
+        raise ValueError("gene_population must have two columns")
+    if gene_population.dtype != torch.int32 and gene_population.dtype != torch.int64:
+        raise ValueError("gene_population must have torch.int32 or torch.int64 dtype")
+    if gene_population.shape[0] == 0:
+        raise ValueError("gene_population must have at least one row")
+    if not torch.all((gene_population[:, 1] == 0) | (gene_population[:, 1] == 1)):
+        raise ValueError("gene_population second column must be binary")
     if not isinstance(unaffected_perturbation_abs_mean, float):
         raise ValueError("unaffected_perturbation_abs_mean must be a float")
     if not isinstance(unaffected_perturbation_std, float):
@@ -269,8 +269,8 @@ def generate_perturbation_binding_data(
     if affected_binding_lambda <= 0:
         raise ValueError("affected_binding_lambda must be > 0")
 
-    total = gene_populations.shape[0]
-    signal_group_size = torch.sum(gene_populations[:, 1]).item()
+    total = gene_population.shape[0]
+    signal_group_size = torch.sum(gene_population[:, 1]).item()
 
     # Generate effects
     perturbation_effect = generate_perturbation_effects(
@@ -292,8 +292,8 @@ def generate_perturbation_binding_data(
     # Combine into DataFrame and return
     df = pd.DataFrame(
         {
-            "gene_id": gene_populations[:, 0].numpy(),
-            "signal": gene_populations[:, 1].numpy().astype(bool),
+            "gene_id": gene_population[:, 0].numpy(),
+            "signal": gene_population[:, 1].numpy().astype(bool),
             "expression_effect": perturbation_effect.numpy(),
             "expression_pvalue": perturbation_pvalues.numpy(),
             "binding_effect": binding_effect.numpy(),
