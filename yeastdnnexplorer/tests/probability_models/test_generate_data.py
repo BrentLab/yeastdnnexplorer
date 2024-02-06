@@ -17,37 +17,37 @@ def test_generate_gene_population():
     signal_ratio = 0.3
     signal_group_size = int(total_genes * signal_ratio)
 
-    gene_populations = generate_gene_population(total_genes, signal_ratio)
+    gene_population = generate_gene_population(total_genes, signal_ratio)
 
     # Check if the output is a 2D tensor
-    assert gene_populations.ndim == 2
+    assert gene_population.ndim == 2
 
     # Check if the output has the correct shape
-    assert gene_populations.shape == (total_genes, 2)
+    assert gene_population.shape == (total_genes, 2)
 
     # Check if the first column contains identifiers 0 to total-1
-    assert all(gene_populations[:, 0] == torch.arange(total_genes))
+    assert all(gene_population[:, 0] == torch.arange(total_genes))
 
     # Check if the second column contains the correct number of signal
     # and non-signal genes
-    assert torch.sum(gene_populations[:, 1]) == signal_group_size
-    assert torch.sum(gene_populations[:, 1] == 0) == total_genes - signal_group_size
+    assert torch.sum(gene_population[:, 1]) == signal_group_size
+    assert torch.sum(gene_population[:, 1] == 0) == total_genes - signal_group_size
 
     # Additional tests could include checking the datatype of the tensor elements
-    assert gene_populations.dtype == torch.int32
+    assert gene_population.dtype == torch.int32
 
 
 @pytest.mark.parametrize("total, ratio", [(1000, 0.3), (500, 0.5), (2000, 0.1)])
-def test_gene_populations(total, ratio):
-    gene_populations = generate_gene_population(total, ratio)
+def test_gene_population(total, ratio):
+    gene_population = generate_gene_population(total, ratio)
     signal_group_size = int(total * ratio)
 
-    assert gene_populations.shape == (total, 2)
-    assert torch.sum(gene_populations[:, 1]) == signal_group_size
-    assert torch.sum(gene_populations[:, 1] == 0) == total - signal_group_size
+    assert gene_population.shape == (total, 2)
+    assert torch.sum(gene_population[:, 1]) == signal_group_size
+    assert torch.sum(gene_population[:, 1] == 0) == total - signal_group_size
 
 
-def test_gene_populations_invalid_input():
+def test_gene_population_invalid_input():
     with pytest.raises(ValueError):
         # invalid string input
         generate_gene_population(total="1000", signal_group=0.3)
@@ -203,11 +203,11 @@ def test_generate_perturbation_binding_data():
     # Setup
     gene_count = 100
     signal_group_size = 50
-    gene_populations = torch.randint(0, 2, (gene_count, 2), dtype=torch.int32)
-    gene_populations[:, 1] = (torch.arange(gene_count) < signal_group_size).int()
+    gene_population = torch.randint(0, 2, (gene_count, 2), dtype=torch.int32)
+    gene_population[:, 1] = (torch.arange(gene_count) < signal_group_size).int()
 
     # Call the function
-    result = generate_perturbation_binding_data(gene_populations)
+    result = generate_perturbation_binding_data(gene_population)
 
     # Validate the result
     assert isinstance(result, pd.DataFrame), "Output should be a DataFrame"
