@@ -3,7 +3,7 @@ import torch.nn as nn
 import torch
 
 class SimpleModel(pl.LightningModule):
-    def __init__(self, input_dim, output_dim, lr):
+    def __init__(self, input_dim, output_dim, lr=0.001):
         super(SimpleModel, self).__init__()
         self.input_dim = input_dim
         self.output_dim = output_dim
