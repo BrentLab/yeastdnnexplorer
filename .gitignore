@@ -1,5 +1,5 @@
 # local tmp files
-./tmp/*
+tmp/*
 # But do not ignore README.md in the tmp directory
 !/tmp/README.md
 
