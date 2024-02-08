@@ -14,9 +14,16 @@ class MyDataModule(LightningDataModule):
         pass        
 
     def setup(self, stage=None):
-        # get the in silico data
+        # TODO get the in silico data, will need to generate as many tables as we have genes (each table is associated with one TF)
+            # binding_effect col is for the binding dataset table
+            # perturbation_effect col is for the perturbation dataset table
+            # so will generate 1000 tables and then write logic to create our matrices from those two tables
+        
+        # gene_population = generate_gene_population(1000, 0.3)
+        # population1_tf1_data = generate_perturbation_binding_data(gene_population, 0.0, 1.0, 3.0, 1.0, 1e-3, 0.5)
+        # population1_tf1_data['regulator'] = 'TF1'
 
-        # transform data into form that model will use
+        # TODO transform data into form that model will use (need to turn into the two matrices as described)
 
         # Set our datasets
         # self.train_dataset = TensorDataset(...)
