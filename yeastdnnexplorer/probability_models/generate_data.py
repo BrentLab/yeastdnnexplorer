@@ -1,3 +1,4 @@
+import inspect
 import logging
 from collections.abc import Callable
 
@@ -235,7 +236,7 @@ def default_perturbation_effect_adjustment_function(
     Default function to adjust the mean of the perturbation effect based on the
     enrichment score.
 
-    All functions that are passed to generate_perturbation_data() in the argument
+    All functions that are passed to generate_perturbation_effects() in the argument
     adjustment_function must have the same signature as this function.
 
     :param binding_enrichment_data: A tensor of enrichment scores for each gene with
@@ -340,6 +341,20 @@ def generate_perturbation_effects(
         raise ValueError(
             "noise_mean, noise_std, signal_mean, signal_std, "
             "and max_mean_adjustment must be floats"
+        )
+    # check the Callable signature
+    if not all(
+        i in inspect.signature(adjustment_function).parameters
+        for i in (
+            "binding_enrichment_data",
+            "signal_mean",
+            "noise_mean",
+            "max_adjustment",
+        )
+    ):
+        raise ValueError(
+            "adjustment_function must have the signature "
+            "(binding_enrichment_data, signal_mean, noise_mean, max_adjustment)"
         )
 
     signal_mask = (binding_data[:, :, 0] == 1).any(dim=1)
