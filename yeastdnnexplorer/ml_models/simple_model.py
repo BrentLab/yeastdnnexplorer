@@ -20,6 +20,7 @@ class SimpleModel(pl.LightningModule):
         x, y = batch
         y_pred = self(x)
         loss = nn.functional.mse_loss(y_pred, y)
+        self.log('train_loss', loss)
         return loss
     
     def validation_step(self, batch, batch_idx):
@@ -33,6 +34,7 @@ class SimpleModel(pl.LightningModule):
         x, y = batch
         y_pred = self(x)
         loss = nn.functional.mse_loss(y_pred, y)
+        self.log('test_loss', loss)
         return loss
 
     def configure_optimizers(self):

@@ -57,7 +57,7 @@ def simple_model_synthetic_data_experiment(batch_size, lr, max_epochs, using_ran
     trainer.fit(model, data_module)
 
     test_results = trainer.test(model, datamodule=data_module)
-    print(test_results) # TODO this is empty right now because no logging has been implemented in the model
+    print(test_results) # this prints all metrics that were logged during the test phase
 
 def parse_args_for_synthetic_data_experiment():
     parser = argparse.ArgumentParser(description='Simple Model Synthetic Data Experiment')
