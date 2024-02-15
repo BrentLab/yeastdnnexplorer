@@ -2,8 +2,26 @@ import sys
 import argparse
 
 from pytorch_lightning import Trainer, seed_everything
+from pytorch_lightning.callbacks import ModelCheckpoint
+
 from yeastdnnexplorer.ml_models.simple_model import SimpleModel
 from yeastdnnexplorer.data_loaders.synthetic_data_loader import SyntheticDataLoader
+
+''' Checkpoint callbacks tell the model when to save a checkpoint of the model during training and what to save in the checkpoint.'''
+# Callback to save the best model based on validation loss
+best_model_checkpoint = ModelCheckpoint(
+    monitor='val_loss',
+    mode='min',
+    filename='best-model-{epoch:02d}-{val_loss:.2f}',
+    save_top_k=1
+)
+
+# Callback to save checkpoints every 5 epochs, regardless of performance
+periodic_checkpoint = ModelCheckpoint(
+    filename='periodic-{epoch:02d}',
+    every_n_epochs=2,
+    save_top_k=-1  # Setting -1 saves all checkpoints
+)
 
 def main():
     args = parse_args_for_synthetic_data_experiment()
@@ -30,7 +48,12 @@ def main():
 def simple_model_synthetic_data_experiment(batch_size, lr, max_epochs, using_random_seed, accelerator):
     data_module = SyntheticDataLoader(batch_size=batch_size, num_genes=1000, num_tfs=4, val_size=0.1, test_size=0.1, random_state=42)
     model = SimpleModel(input_dim=4, output_dim=4, lr=lr)
-    trainer = Trainer(max_epochs=max_epochs, deterministic=using_random_seed, accelerator=accelerator)
+    trainer = Trainer(
+        max_epochs=max_epochs, 
+        deterministic=using_random_seed, 
+        accelerator=accelerator,
+        callbacks=[best_model_checkpoint, periodic_checkpoint]
+    )
     trainer.fit(model, data_module)
 
     test_results = trainer.test(model, datamodule=data_module)

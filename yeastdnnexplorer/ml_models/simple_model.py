@@ -26,6 +26,7 @@ class SimpleModel(pl.LightningModule):
         x, y = batch
         y_pred = self(x) 
         loss = nn.functional.mse_loss(y_pred, y)
+        self.log('val_loss', loss)
         return loss
     
     def test_step(self, batch, batch_idx):
