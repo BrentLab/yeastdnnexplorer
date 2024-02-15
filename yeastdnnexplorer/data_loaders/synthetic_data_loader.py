@@ -1,6 +1,7 @@
 from pytorch_lightning import LightningDataModule
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.model_selection import train_test_split
+from typing import Any, List, Optional
 import numpy as np
 import pandas as pd
 import torch
@@ -8,7 +9,15 @@ import torch
 from yeastdnnexplorer.probability_models.generate_data import (generate_gene_population, generate_perturbation_binding_data)
 
 class SyntheticDataLoader(LightningDataModule):
-    def __init__(self, batch_size=32, num_genes=1000, num_tfs=4, val_size=0.1, test_size=0.1, random_state=42):
+    def __init__(
+            self, 
+            batch_size: int = 32,
+            num_genes: int = 1000, 
+            num_tfs: int = 4, 
+            val_size: float = 0.1, 
+            test_size: float = 0.1, 
+            random_state: int = 42
+        ):
         super().__init__()
         self.batch_size = batch_size
         self.num_genes = num_genes
@@ -18,9 +27,11 @@ class SyntheticDataLoader(LightningDataModule):
         self.random_state = random_state
         self.all_raw_data = []
         self.binding_effect_matrix = None
-        self.perturbation_effect_matrix = None
+        self.perturbation_effect_matrix: Optional[TensorDataset] =  None
+        self.val_dataset: Optional[TensorDataset] =  None
+        self.test_dataset: Optional[TensorDataset] =  None
 
-    def prepare_data(self):
+    def prepare_data(self) -> None:
         for i in range(self.num_tfs):
             # load in the in silico data for this tf
             gene_population = generate_gene_population(self.num_genes, 0.3)
@@ -33,7 +44,7 @@ class SyntheticDataLoader(LightningDataModule):
             self.all_raw_data.append(population_data.drop(['regulator', 'gene_id'], axis=1).to_numpy(dtype=np.float32))
 
 
-    def setup(self, stage=None):
+    def setup(self, stage: Optional[str] = None) -> None:
         # we set up our data in this method (convert self.all_raw_data into the two matrices that the model will use)
         stacked_array = np.stack(self.all_raw_data, axis=0)
         tensor_3d = torch.tensor(stacked_array, dtype=torch.float32)
@@ -69,11 +80,11 @@ class SyntheticDataLoader(LightningDataModule):
         self.val_dataset = TensorDataset(X_val, Y_val)
         self.test_dataset = TensorDataset(X_test, Y_test)
 
-    def train_dataloader(self):
+    def train_dataloader(self) -> DataLoader:
         return DataLoader(self.train_dataset, batch_size=self.batch_size, num_workers=15, shuffle=True, persistent_workers=True)
 
-    def val_dataloader(self):
+    def val_dataloader(self) -> DataLoader:
         return DataLoader(self.val_dataset, batch_size=self.batch_size, num_workers=15, shuffle=False, persistent_workers=True)
     
-    def test_dataloader(self):
-        return DataLoader(self.val_dataset, batch_size=self.batch_size, num_workers=15, shuffle=False)
+    def test_dataloader(self) -> DataLoader:
+        return DataLoader(self.val_dataset, batch_size=self.batch_size, num_workers=15, shuffle=False, persistent_workers=True)
