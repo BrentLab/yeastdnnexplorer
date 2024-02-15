@@ -20,6 +20,18 @@ class SimpleModel(pl.LightningModule):
         y_pred = self(x)
         loss = nn.functional.mse_loss(y_pred, y)
         return loss
+    
+    def validation_step(self, batch, batch_idx):
+        x, y = batch
+        y_pred = self(x) 
+        loss = nn.functional.mse_loss(y_pred, y)
+        return loss
+    
+    def test_step(self, batch, batch_idx):
+        x, y = batch
+        y_pred = self(x)
+        loss = nn.functional.mse_loss(y_pred, y)
+        return loss
 
     def configure_optimizers(self):
         return torch.optim.Adam(self.parameters(), lr=self.lr)

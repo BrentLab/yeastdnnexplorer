@@ -3,7 +3,7 @@ import argparse
 
 from pytorch_lightning import Trainer, seed_everything
 from yeastdnnexplorer.ml_models.simple_model import SimpleModel
-from yeastdnnexplorer.data_loaders.synthetic_data_loader import MyDataModule
+from yeastdnnexplorer.data_loaders.synthetic_data_loader import SyntheticDataLoader
 
 def main():
     args = parse_args_for_synthetic_data_experiment()
@@ -28,13 +28,13 @@ def main():
     )
 
 def simple_model_synthetic_data_experiment(batch_size, lr, max_epochs, using_random_seed, accelerator):
-    data_module = MyDataModule(batch_size=batch_size)
-    model = SimpleModel(input_dim=1000, output_dim=1, lr=lr)
+    data_module = SyntheticDataLoader(batch_size=batch_size, num_genes=1000, num_tfs=4, val_size=0.1, test_size=0.1, random_state=42)
+    model = SimpleModel(input_dim=4, output_dim=4, lr=lr)
     trainer = Trainer(max_epochs=max_epochs, deterministic=using_random_seed, accelerator=accelerator)
     trainer.fit(model, data_module)
 
     test_results = trainer.test(model, datamodule=data_module)
-    print(test_results) # TODO should implement logging in the future to get more detailed results & info
+    print(test_results) # TODO this is empty right now because no logging has been implemented in the model
 
 def parse_args_for_synthetic_data_experiment():
     parser = argparse.ArgumentParser(description='Simple Model Synthetic Data Experiment')
