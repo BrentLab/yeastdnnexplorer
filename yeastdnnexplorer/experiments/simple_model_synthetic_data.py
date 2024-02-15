@@ -2,6 +2,7 @@ import sys
 import argparse
 
 from pytorch_lightning import Trainer, seed_everything
+from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
 from pytorch_lightning.callbacks import ModelCheckpoint
 
 from yeastdnnexplorer.ml_models.simple_model import SimpleModel
@@ -22,6 +23,10 @@ periodic_checkpoint = ModelCheckpoint(
     every_n_epochs=2,
     save_top_k=-1  # Setting -1 saves all checkpoints
 )
+
+# We also need to configure the loggers that we're going to use
+tb_logger = TensorBoardLogger("logs/tensorboard_logs")
+csv_logger = CSVLogger("logs/csv_logs")
 
 def main():
     args = parse_args_for_synthetic_data_experiment()
@@ -52,7 +57,8 @@ def simple_model_synthetic_data_experiment(batch_size, lr, max_epochs, using_ran
         max_epochs=max_epochs, 
         deterministic=using_random_seed, 
         accelerator=accelerator,
-        callbacks=[best_model_checkpoint, periodic_checkpoint]
+        callbacks=[best_model_checkpoint, periodic_checkpoint],
+        logger=[tb_logger, csv_logger]
     )
     trainer.fit(model, data_module)
 
