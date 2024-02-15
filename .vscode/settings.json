@@ -1,7 +1,9 @@
 {
     "editor.formatOnSave": true,
     "cSpell.words": [
+        "arange",
         "dtype",
+        "ndim",
         "pval",
         "pvalues",
         "randperm"
