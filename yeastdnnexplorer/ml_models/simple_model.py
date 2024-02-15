@@ -8,6 +8,7 @@ class SimpleModel(pl.LightningModule):
         self.input_dim = input_dim
         self.output_dim = output_dim
         self.lr = lr
+        self.save_hyperparameters() # needed so that the hyperparameters are saved with the model and can be loaded later (checkpoints wouldn't load without this line)
 
         # define layers for the model here
         self.linear1 = nn.Linear(input_dim, output_dim)
