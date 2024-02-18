@@ -25,6 +25,21 @@ class SyntheticDataLoader(LightningDataModule):
             test_size: float = 0.1, 
             random_state: int = 42
         ):
+        if not isinstance(batch_size, int) or batch_size < 1:
+            raise TypeError("batch_size must be a positive integer")
+        if not isinstance(num_genes, int) or num_genes < 1:
+            raise TypeError("num_genes must be a positive integer")
+        if not isinstance(signal, list) or not all(isinstance(x, (int, float)) for x in signal):
+            raise TypeError("signal must be a list of integers or floats")
+        if not isinstance(n_sample, list) or not all(isinstance(x, int) for x in n_sample):
+            raise TypeError("n_sample must be a list of integers")
+        if not isinstance(val_size, (int, float)) or val_size <= 0 or val_size >= 1:
+            raise TypeError("val_size must be a float between 0 and 1 (inclusive)")
+        if not isinstance(test_size, (int, float)) or test_size <= 0 or test_size >= 1:
+            raise TypeError("test_size must be a float between 0 and 1 (inclusive)")
+        if not isinstance(random_state, int):
+            raise TypeError("random_state must be an integer")
+
         super().__init__()
         self.batch_size = batch_size
         self.num_genes = num_genes
@@ -35,8 +50,8 @@ class SyntheticDataLoader(LightningDataModule):
         self.test_size = test_size
         self.random_state = random_state
         self.final_data_tensor: torch.Tensor = None
-        self.binding_effect_matrix = None
-        self.perturbation_effect_matrix: Optional[TensorDataset] =  None
+        self.binding_effect_matrix: Optional[torch.Tensor] = None
+        self.perturbation_effect_matrix: Optional[torch.Tensor] =  None
         self.val_dataset: Optional[TensorDataset] =  None
         self.test_dataset: Optional[TensorDataset] =  None
 

@@ -35,7 +35,7 @@ def main() -> None:
 
     # use default values if flag not present in command line arguments
     batch_size = args.batch_size or 32
-    lr = args.lr or 0.001
+    lr = args.lr or 0.01
     max_epochs = args.max_epochs or 10
     random_seed = args.random_seed or 42
     gpus = args.gpus or 0
@@ -59,6 +59,8 @@ def simple_model_synthetic_data_experiment(
         using_random_seed: bool, 
         accelerator: str
     ) -> None:
+    # we don't need to do assertions for type checking here 
+        # everything was type checked in the parse_args_for_synthetic_data_experiment function
 
     data_module = SyntheticDataLoader(
         batch_size=batch_size, 
@@ -87,13 +89,27 @@ def simple_model_synthetic_data_experiment(
 
 def parse_args_for_synthetic_data_experiment() -> Namespace:
     parser = argparse.ArgumentParser(description='Simple Model Synthetic Data Experiment')
-    parser.add_argument('--batch_size', action='store') # action=store_true gives a boolean value for if flag is present or not, store gives the value of the flag
-    parser.add_argument('--lr', action='store')
-    parser.add_argument('--max_epochs', action='store')
-    parser.add_argument('--random_seed', action='store')
-    parser.add_argument('--gpus', action='store')
+    parser.add_argument('--batch_size', action='store', type=int) # action=store_true gives a boolean value for if flag is present or not, store gives the value of the flag
+    parser.add_argument('--lr', action='store', type=float)
+    parser.add_argument('--max_epochs', action='store', type=int)
+    parser.add_argument('--random_seed', action='store', type=int)
+    parser.add_argument('--gpus', action='store', type=int)
 
+    # note that this performs the type checking needed, so we don't need assertion checks for that
     args = parser.parse_args()
+
+    # assert correct values
+    if args.batch_size and args.batch_size < 1:
+        raise ValueError("batch_size must be an integer greater than 0")
+    if args.lr and args.lr <= 0:
+        raise ValueError("lr must be a float greater than 0")
+    if args.max_epochs and args.max_epochs < 1:
+        raise ValueError("max_epochs must be an integer greater than 0")
+    if args.random_seed and args.random_seed < 0:
+        raise ValueError("random_seed must be an integer greater than or equal to 0")
+    if args.gpus and args.gpus < 0:
+        raise ValueError("gpus must be an integer greater than or equal to 0")
+
     return args
 
 if __name__ == '__main__':
