@@ -1,0 +1,1 @@
+::: yeastdnnexplorer.probability_models.generate_data.default_perturbation_effect_adjustment_function
