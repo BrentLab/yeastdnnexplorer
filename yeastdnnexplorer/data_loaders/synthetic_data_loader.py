@@ -6,14 +6,21 @@ import numpy as np
 import pandas as pd
 import torch
 
-from yeastdnnexplorer.probability_models.generate_data import (generate_gene_population, generate_perturbation_binding_data)
+from yeastdnnexplorer.probability_models.generate_data import (
+    generate_gene_population,
+    generate_binding_effects, 
+    generate_pvalues, 
+    generate_perturbation_effects, 
+    GenePopulation
+)
 
 class SyntheticDataLoader(LightningDataModule):
     def __init__(
             self, 
             batch_size: int = 32,
             num_genes: int = 1000, 
-            num_tfs: int = 4, 
+            signal: List[int] = [0.1, 0.15, 0.2, 0.25, 0.3],
+            n_sample: List[int] = [1, 1, 2, 2, 4],
             val_size: float = 0.1, 
             test_size: float = 0.1, 
             random_state: int = 42
@@ -21,47 +28,61 @@ class SyntheticDataLoader(LightningDataModule):
         super().__init__()
         self.batch_size = batch_size
         self.num_genes = num_genes
-        self.num_tfs = num_tfs
+        self.num_tfs = sum(n_sample) # sum of all n_sample is the number of TFs
+        self.signal = signal
+        self.n_sample = n_sample
         self.val_size = val_size
         self.test_size = test_size
         self.random_state = random_state
-        self.all_raw_data = []
+        self.final_data_tensor: torch.Tensor = None
         self.binding_effect_matrix = None
         self.perturbation_effect_matrix: Optional[TensorDataset] =  None
         self.val_dataset: Optional[TensorDataset] =  None
         self.test_dataset: Optional[TensorDataset] =  None
 
     def prepare_data(self) -> None:
-        for i in range(self.num_tfs):
-            # load in the in silico data for this tf
-            gene_population = generate_gene_population(self.num_genes, 0.3)
-            population_data = generate_perturbation_binding_data(gene_population, 0.0, 1.0, 3.0, 1.0, 1e-3, 0.5)
-            population_data['regulator'] = f'TF{i}'
+        # this will be a list of length 10 with a GenePopulation object in each element
+        gene_populations_list = []
+        for signal_proportion, n_draws in zip(self.signal, self.n_sample):
+            for _ in range(n_draws):
+                gene_populations_list.append(generate_gene_population(self.num_genes, signal_proportion))
 
-            # we are dropping the gene_id column for now because tensors do not support non-numeric data
-            # we can also drop the regulator column because we know which TF it corresponds to (the z-index in final tensor will be the TF index)
+        # Generate binding data for each gene population
+        binding_effect_list = [generate_binding_effects(gene_population)
+                            for gene_population in gene_populations_list]
 
-            self.all_raw_data.append(population_data.drop(['regulator', 'gene_id'], axis=1).to_numpy(dtype=np.float32))
 
+        # Calculate p-values for binding data
+        binding_pvalue_list = [generate_pvalues(binding_data) for binding_data in binding_effect_list]
+
+        binding_data_combined = [torch.stack((gene_population.labels, binding_effect, binding_pval), dim=1)
+                                for gene_population, binding_effect, binding_pval
+                                in zip (gene_populations_list, binding_effect_list, binding_pvalue_list)]
+
+        # Stack along a new dimension (dim=1) to create a tensor of shape [num_genes, num_TFs, 3]
+        binding_data_tensor = torch.stack(binding_data_combined, dim=1)
+
+        perturbation_effects_list = [generate_perturbation_effects(binding_data_tensor)
+                             for _ in range(sum(self.n_sample))]
+
+        perturbation_pvalue_list = [generate_pvalues(perturbation_effects)
+                            for perturbation_effects in perturbation_effects_list]
+        
+        # Convert lists to tensors if they are not already
+        perturbation_effects_tensor = torch.stack(perturbation_effects_list, dim=1)
+        perturbation_pvalues_tensor = torch.stack(perturbation_pvalue_list, dim=1)
+
+        # Ensure perturbation data is reshaped to match [n_genes, n_tfs]
+        # This step might need adjustment based on the actual shapes of your tensors.
+        perturbation_effects_tensor = perturbation_effects_tensor.unsqueeze(-1)  # Adds an extra dimension for concatenation
+        perturbation_pvalues_tensor = perturbation_pvalues_tensor.unsqueeze(-1)  # Adds an extra dimension for concatenation
+
+        # Concatenate along the last dimension to form a [n_genes, n_tfs, 5] tensor
+        self.final_data_tensor = torch.cat((binding_data_tensor, perturbation_effects_tensor, perturbation_pvalues_tensor), dim=2)
 
     def setup(self, stage: Optional[str] = None) -> None:
-        # we set up our data in this method (convert self.all_raw_data into the two matrices that the model will use)
-        stacked_array = np.stack(self.all_raw_data, axis=0)
-        tensor_3d = torch.tensor(stacked_array, dtype=torch.float32)
-
-        self.binding_effect_matrix = [[0 for _ in range(self.num_tfs)] for _ in range(self.num_genes)] # rows will be genes, cols will be TFs, values will be binding effect
-        self.perturbation_effect_matrix = [[0 for _ in range(self.num_tfs)] for _ in range(self.num_genes)] # rows will be genes, cols will be TFs, values will be perturbation effect
-
-        # TODO this shouldn't be hardcoded (needs to be checked in some way)
-        binding_effect_col_index = 3
-        perturbation_effect_col_index = 1
-
-        for tf in range(self.num_tfs):
-            for gene in range(self.num_genes): 
-                self.binding_effect_matrix[gene][tf] = tensor_3d[tf][gene][binding_effect_col_index].item()
-
-                # use absolute value because we are only interested in if it changed, not whether it went up or down
-                self.perturbation_effect_matrix[gene][tf] = abs(tensor_3d[tf][gene][perturbation_effect_col_index].item())
+        self.binding_effect_matrix = self.final_data_tensor[:, :, 1]
+        self.perturbation_effect_matrix = self.final_data_tensor[:, :, 3]
 
         # split into train, val, and test
         X_train, X_temp, Y_train, Y_temp = train_test_split(self.binding_effect_matrix, self.perturbation_effect_matrix, test_size=(self.val_size + self.test_size), random_state=self.random_state)
@@ -87,4 +108,4 @@ class SyntheticDataLoader(LightningDataModule):
         return DataLoader(self.val_dataset, batch_size=self.batch_size, num_workers=15, shuffle=False, persistent_workers=True)
     
     def test_dataloader(self) -> DataLoader:
-        return DataLoader(self.val_dataset, batch_size=self.batch_size, num_workers=15, shuffle=False, persistent_workers=True)
+        return DataLoader(self.test_dataset, batch_size=self.batch_size, num_workers=15, shuffle=False, persistent_workers=True)

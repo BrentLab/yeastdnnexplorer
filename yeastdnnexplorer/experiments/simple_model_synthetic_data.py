@@ -60,8 +60,19 @@ def simple_model_synthetic_data_experiment(
         accelerator: str
     ) -> None:
 
-    data_module = SyntheticDataLoader(batch_size=batch_size, num_genes=1000, num_tfs=4, val_size=0.1, test_size=0.1, random_state=42)
-    model = SimpleModel(input_dim=4, output_dim=4, lr=lr)
+    data_module = SyntheticDataLoader(
+        batch_size=batch_size, 
+        num_genes=1000, 
+        signal = [0.1, 0.15, 0.2, 0.25, 0.3],
+        n_sample = [1, 1, 2, 2, 4],
+        val_size=0.1, 
+        test_size=0.1, 
+        random_state=42
+    )
+
+    num_tfs = sum(data_module.n_sample) # sum of all n_sample is the number of TFs
+
+    model = SimpleModel(input_dim=num_tfs, output_dim=num_tfs, lr=lr)
     trainer = Trainer(
         max_epochs=max_epochs, 
         deterministic=using_random_seed, 
