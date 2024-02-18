@@ -1,5 +1,7 @@
 import sys
+
 import argparse
+from argparse import Namespace
 
 from pytorch_lightning import Trainer, seed_everything
 from pytorch_lightning.loggers import TensorBoardLogger, CSVLogger
@@ -24,11 +26,11 @@ periodic_checkpoint = ModelCheckpoint(
     save_top_k=-1  # Setting -1 saves all checkpoints
 )
 
-# We also need to configure the loggers that we're going to use
+''' We also need to configure the loggers that we're going to use '''
 tb_logger = TensorBoardLogger("logs/tensorboard_logs")
 csv_logger = CSVLogger("logs/csv_logs")
 
-def main():
+def main() -> None:
     args = parse_args_for_synthetic_data_experiment()
 
     # use default values if flag not present in command line arguments
@@ -50,7 +52,14 @@ def main():
         accelerator='gpu' if (gpus > 0) else 'cpu'
     )
 
-def simple_model_synthetic_data_experiment(batch_size, lr, max_epochs, using_random_seed, accelerator):
+def simple_model_synthetic_data_experiment(
+        batch_size: int, 
+        lr: float, 
+        max_epochs: int, 
+        using_random_seed: bool, 
+        accelerator: str
+    ) -> None:
+
     data_module = SyntheticDataLoader(batch_size=batch_size, num_genes=1000, num_tfs=4, val_size=0.1, test_size=0.1, random_state=42)
     model = SimpleModel(input_dim=4, output_dim=4, lr=lr)
     trainer = Trainer(
@@ -65,7 +74,7 @@ def simple_model_synthetic_data_experiment(batch_size, lr, max_epochs, using_ran
     test_results = trainer.test(model, datamodule=data_module)
     print(test_results) # this prints all metrics that were logged during the test phase
 
-def parse_args_for_synthetic_data_experiment():
+def parse_args_for_synthetic_data_experiment() -> Namespace:
     parser = argparse.ArgumentParser(description='Simple Model Synthetic Data Experiment')
     parser.add_argument('--batch_size', action='store') # action=store_true gives a boolean value for if flag is present or not, store gives the value of the flag
     parser.add_argument('--lr', action='store')
