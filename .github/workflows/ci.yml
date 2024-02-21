@@ -41,6 +41,8 @@ jobs:
             windows-2022,
             windows-2019,
           ]
+        # note that this package requires Python 3.11. I don't see any reason
+        # at this point to make it backwards compatible
         python-version: ["3.11"]
     runs-on: ${{ matrix.os }}
     steps:
