@@ -8,13 +8,17 @@ import torch
 
 from yeastdnnexplorer.probability_models.generate_data import (
     generate_gene_population,
-    generate_binding_effects, 
-    generate_pvalues, 
-    generate_perturbation_effects, 
-    GenePopulation
+    generate_binding_effects,
+    generate_pvalues,
+    generate_perturbation_effects,
 )
 
 class SyntheticDataLoader(LightningDataModule):
+    """
+    A class for a synthetic data loader that generates synthetic bindiing & perturbation effect data for training, validation, and testing a model
+    This class contains all of the logic for generating and parsing the synthetic data, as well as splitting it into train, validation, and test sets
+    It is a subclass of pytorch_lightning.LightningDataModule, which is similar to a regular PyTorch DataLoader but with added functionality for data loading
+    """
     def __init__(
             self, 
             batch_size: int = 32,
@@ -24,7 +28,34 @@ class SyntheticDataLoader(LightningDataModule):
             val_size: float = 0.1, 
             test_size: float = 0.1, 
             random_state: int = 42
-        ):
+        ) -> None:
+        """
+        Constructor of SyntheticDataLoader
+
+        :param batch_size: The number of samples in each mini-batch
+        :type batch_size: int
+        :param num_genes: The number of genes in the synthetic data (this is the number of datapoints in our dataset)
+        :type num_genes: int
+        :param signal: The proportion of genes in each sample group that are put in the signal grop (i.e. have a non-zero binding effect and expression response)
+        :type signal: List[int]
+        :param n_sample: The number of samples to draw from each signal group
+        :type n_sample: List[int]
+        :param val_size: The proportion of the dataset to include in the validation split
+        :type val_size: float
+        :param test_size: The proportion of the dataset to include in the test split
+        :type test_size: float
+        :param random_state: The random seed to use for splitting the data (keep this consistent to ensure reproduceability)
+        :type random_state: int
+
+        :raises TypeError: If batch_size is not an positive integer
+        :raises TypeError: If num_genes is not an positive integer
+        :raises TypeError: If signal is not a list of integers or floats
+        :raises TypeError: If n_sample is not a list of integers
+        :raises TypeError: If val_size is not a float between 0 and 1 (inclusive)
+        :raises TypeError: If test_size is not a float between 0 and 1 (inclusive)
+        :raises TypeError: If random_state is not an integer
+        :raises ValueError: If val_size + test_size is greater than 1 (i.e. the splits are too large)
+        """
         if not isinstance(batch_size, int) or batch_size < 1:
             raise TypeError("batch_size must be a positive integer")
         if not isinstance(num_genes, int) or num_genes < 1:
@@ -39,6 +70,8 @@ class SyntheticDataLoader(LightningDataModule):
             raise TypeError("test_size must be a float between 0 and 1 (inclusive)")
         if not isinstance(random_state, int):
             raise TypeError("random_state must be an integer")
+        if test_size + val_size > 1:
+            raise ValueError("val_size + test_size must be less than or equal to 1")
 
         super().__init__()
         self.batch_size = batch_size
@@ -56,6 +89,11 @@ class SyntheticDataLoader(LightningDataModule):
         self.test_dataset: Optional[TensorDataset] =  None
 
     def prepare_data(self) -> None:
+        """
+        Function to generate the raw synthetic data and save it in a tensor
+        For explanations of the functions used to generate the data, see the generate_in_silico_data tutorial notebook in the docs
+        No assertion checks are performed as that is handled in the functions in generate_data.py
+        """
         # this will be a list of length 10 with a GenePopulation object in each element
         gene_populations_list = []
         for signal_proportion, n_draws in zip(self.signal, self.n_sample):
@@ -96,6 +134,13 @@ class SyntheticDataLoader(LightningDataModule):
         self.final_data_tensor = torch.cat((binding_data_tensor, perturbation_effects_tensor, perturbation_pvalues_tensor), dim=2)
 
     def setup(self, stage: Optional[str] = None) -> None:
+        """
+        This function runs after prepare_data finishes and is used to split the data into train, validation, and test sets
+        It ensures that these datasets are of the correct dimensionality and size to be used by the model
+
+        :param stage: The stage of the data setup (either 'fit' for training, 'validate' for validation, or 'test' for testing), unused for now as the model is not complicated enough to necessitate this
+        :type stage: Optional[str]
+        """
         self.binding_effect_matrix = self.final_data_tensor[:, :, 1]
         self.perturbation_effect_matrix = self.final_data_tensor[:, :, 3]
 
@@ -117,10 +162,28 @@ class SyntheticDataLoader(LightningDataModule):
         self.test_dataset = TensorDataset(X_test, Y_test)
 
     def train_dataloader(self) -> DataLoader:
+        """
+        Function to return the training dataloader, we shuffle to avoid learning based on the order of the data 
+
+        :return: The training dataloader
+        :rtype: DataLoader
+        """
         return DataLoader(self.train_dataset, batch_size=self.batch_size, num_workers=15, shuffle=True, persistent_workers=True)
 
     def val_dataloader(self) -> DataLoader:
+        """
+        Function to return the validation dataloader
+
+        :return: The validation dataloader
+        :rtype: DataLoader
+        """
         return DataLoader(self.val_dataset, batch_size=self.batch_size, num_workers=15, shuffle=False, persistent_workers=True)
     
     def test_dataloader(self) -> DataLoader:
+        """
+        Function to return the testing dataloader
+
+        :return: The testing dataloader
+        :rtype: DataLoader
+        """
         return DataLoader(self.test_dataset, batch_size=self.batch_size, num_workers=15, shuffle=False, persistent_workers=True)

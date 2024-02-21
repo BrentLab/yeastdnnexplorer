@@ -10,6 +10,10 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 from yeastdnnexplorer.ml_models.simple_model import SimpleModel
 from yeastdnnexplorer.data_loaders.synthetic_data_loader import SyntheticDataLoader
 
+'''
+Script to train our simple model on synthetic data and save the best model based on validation loss
+'''
+
 ''' Checkpoint callbacks tell the model when to save a checkpoint of the model during training and what to save in the checkpoint.'''
 # Callback to save the best model based on validation loss
 best_model_checkpoint = ModelCheckpoint(
@@ -27,8 +31,8 @@ periodic_checkpoint = ModelCheckpoint(
 )
 
 ''' We also need to configure the loggers that we're going to use '''
-tb_logger = TensorBoardLogger("logs/tensorboard_logs")
-csv_logger = CSVLogger("logs/csv_logs")
+tb_logger = TensorBoardLogger("logs/tensorboard_logs")          # logs to tensorboard for visualization of metrics whie training
+csv_logger = CSVLogger("logs/csv_logs")                         # saves important statistics about training to a csv file upon completion of training
 
 def main() -> None:
     args = parse_args_for_synthetic_data_experiment()
@@ -59,8 +63,23 @@ def simple_model_synthetic_data_experiment(
         using_random_seed: bool, 
         accelerator: str
     ) -> None:
-    # we don't need to do assertions for type checking here 
-        # everything was type checked in the parse_args_for_synthetic_data_experiment function
+    '''
+    Trains a SimpleModel on synthetic data and saves the best model based on validation loss.
+    Defines an instance of Trainer, which is used to train the model with the given dataModule.
+    While much of the training process is captured via logging, we also print the test results at the end of training.
+    We don't need to do assrtions for type checking, as this was done in the parse_args_for_synthetic_data_experiment function.
+
+    :param batch_size: The batch size to use for training
+    :type batch_size: int
+    :param lr: The learning rate to use for training
+    :type lr: float
+    :param max_epochs: The maximum number of epochs to train for
+    :type max_epochs: int
+    :param using_random_seed: Whether or not to use a random seed for reproducibility
+    :type using_random_seed: bool
+    :param accelerator: The accelerator to use for training (e.g. 'gpu', 'cpu')
+    :type accelerator: str
+    '''
 
     data_module = SyntheticDataLoader(
         batch_size=batch_size, 
@@ -88,6 +107,18 @@ def simple_model_synthetic_data_experiment(
     print(test_results) # this prints all metrics that were logged during the test phase
 
 def parse_args_for_synthetic_data_experiment() -> Namespace:
+    """
+    Parses command line arguments for the synthetic data experiment
+
+    :return: The command line arguments
+    :rtype: Namespace
+
+    :raises ValueError: If batch_size is not an integer greater than 0
+    :raises ValueError: If lr is not a float greater than 0
+    :raises ValueError: If max_epochs is not an integer greater than 0
+    :raises ValueError: If random_seed is not an integer greater than or equal to 0
+    :raises ValueError: If gpus is not an integer greater than or equal to 0
+    """
     parser = argparse.ArgumentParser(description='Simple Model Synthetic Data Experiment')
     parser.add_argument('--batch_size', action='store', type=int) # action=store_true gives a boolean value for if flag is present or not, store gives the value of the flag
     parser.add_argument('--lr', action='store', type=float)
