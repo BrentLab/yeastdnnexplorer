@@ -33,10 +33,11 @@ nav:
 - API:
     - Probability Models:
       - Generate Gene Population: probability_models/generate_gene_population.md
-      - probability_models/generate_perturbation_binding_data.md
-      - probability_models/generate_perturbation_effects.md
+      - probability_models/GenePopulation.md
       - probability_models/generate_binding_effects.md
       - probability_models/generate_pvalues.md
+      - probability_models/generate_perturbation_effects.md
+      - probability_models/default_perturbation_effect_adjustment_function.md
 
 markdown_extensions:
     - smarty
