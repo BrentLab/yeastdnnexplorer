@@ -31,9 +31,9 @@ share/python-wheels/
 *.egg
 MANIFEST
 
-# checkpoints / output from model training
-yeastdnnexplorer/experiments/lightning_logs
-yeastdnnexplorer/experiments/logs
+# ignore any log folders anywhere in repo
+**/logs/
+**/lightning_logs/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -160,6 +160,8 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+logs
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
