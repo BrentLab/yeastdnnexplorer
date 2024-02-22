@@ -29,6 +29,7 @@ periodic_checkpoint = ModelCheckpoint(
 tb_logger = TensorBoardLogger("logs/tensorboard_logs")
 csv_logger = CSVLogger("logs/csv_logs")
 
+
 def simple_model_synthetic_data_experiment(
     batch_size: int,
     lr: float,
@@ -127,9 +128,13 @@ def parse_args_for_synthetic_data_experiment() -> Namespace:
 
 
 def main() -> None:
-    """ Main method to run the experiment for training the simple model 
-    using the syntheetic data loader. Saves the best model based on
-    validation loss."""
+    """
+    Main method to run the experiment for training the simple model using the syntheetic
+    data loader.
+
+    Saves the best model based on validation loss.
+
+    """
     args = parse_args_for_synthetic_data_experiment()
 
     # use default values if flag not present in command line arguments
@@ -150,6 +155,7 @@ def main() -> None:
         using_random_seed=True,
         accelerator="gpu" if (gpus > 0) else "cpu",
     )
+
 
 if __name__ == "__main__":
     main()
