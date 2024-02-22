@@ -26,36 +26,8 @@ periodic_checkpoint = ModelCheckpoint(
     save_top_k=-1,  # Setting -1 saves all checkpoints
 )
 # Need to configure the loggers we're going to use
-tb_logger = TensorBoardLogger(
-    "logs/tensorboard_logs"
-)  # logs to tensorboard for visualization of metrics whie training
-csv_logger = CSVLogger(
-    "logs/csv_logs"
-)  # saves important statistics about training to a csv file upon completion of training
-
-
-def main() -> None:
-    args = parse_args_for_synthetic_data_experiment()
-
-    # use default values if flag not present in command line arguments
-    batch_size = args.batch_size or 32
-    lr = args.lr or 0.01
-    max_epochs = args.max_epochs or 10
-    random_seed = args.random_seed or 42
-    gpus = args.gpus or 0
-
-    # set random seed for reproducibility
-    seed_everything(random_seed)
-
-    # run the experiment
-    simple_model_synthetic_data_experiment(
-        batch_size=batch_size,
-        lr=lr,
-        max_epochs=max_epochs,
-        using_random_seed=True,
-        accelerator="gpu" if (gpus > 0) else "cpu",
-    )
-
+tb_logger = TensorBoardLogger("logs/tensorboard_logs")
+csv_logger = CSVLogger("logs/csv_logs")
 
 def simple_model_synthetic_data_experiment(
     batch_size: int,
@@ -153,6 +125,31 @@ def parse_args_for_synthetic_data_experiment() -> Namespace:
 
     return args
 
+
+def main() -> None:
+    """ Main method to run the experiment for training the simple model 
+    using the syntheetic data loader. Saves the best model based on
+    validation loss."""
+    args = parse_args_for_synthetic_data_experiment()
+
+    # use default values if flag not present in command line arguments
+    batch_size = args.batch_size or 32
+    lr = args.lr or 0.01
+    max_epochs = args.max_epochs or 10
+    random_seed = args.random_seed or 42
+    gpus = args.gpus or 0
+
+    # set random seed for reproducibility
+    seed_everything(random_seed)
+
+    # run the experiment
+    simple_model_synthetic_data_experiment(
+        batch_size=batch_size,
+        lr=lr,
+        max_epochs=max_epochs,
+        using_random_seed=True,
+        accelerator="gpu" if (gpus > 0) else "cpu",
+    )
 
 if __name__ == "__main__":
     main()

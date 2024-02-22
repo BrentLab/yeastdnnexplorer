@@ -5,18 +5,13 @@ import argparse
 
 from yeastdnnexplorer.ml_models.simple_model import SimpleModel
 
-
-def main() -> None:
-    args = parse_args_for_inspect_model_experiment()
-
-    # use default values if flag not present in command line arguments
-    checkpoint_file_path = args.checkpoint_file
-
-    inspect_model_experiment(checkpoint_file_path)
-
-
-def inspect_model_experiment(checkpoint_file_path) -> None:
-    """Runs the simple experiement to inspect the parameters of a trained model."""
+def inspect_model_experiment(checkpoint_file_path: str) -> None:
+    """
+    Runs the simple experiement to inspect the parameters of a trained model.
+    
+    :param checkpoint_file_path: The path to the model checkpoint file that we want to inspect
+    :type checkpoint_file_path: str
+    """
 
     # load the model from the checkpoint
     model = SimpleModel.load_from_checkpoint(checkpoint_path=checkpoint_file_path)
@@ -46,6 +41,15 @@ def parse_args_for_inspect_model_experiment() -> argparse.Namespace:
     args = parser.parse_args()
     return args
 
+def main() -> None:
+    """ 
+    Main method to run he experiment for inspecting the parameters of a trained model."""
+    args = parse_args_for_inspect_model_experiment()
+
+    # use default values if flag not present in command line arguments
+    checkpoint_file_path = args.checkpoint_file
+
+    inspect_model_experiment(checkpoint_file_path)
 
 if __name__ == "__main__":
     main()

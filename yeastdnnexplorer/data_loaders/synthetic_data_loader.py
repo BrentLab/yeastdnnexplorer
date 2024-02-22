@@ -23,8 +23,8 @@ class SyntheticDataLoader(LightningDataModule):
         self,
         batch_size: int = 32,
         num_genes: int = 1000,
-        signal: list[float] = [0.1, 0.15, 0.2, 0.25, 0.3],
-        n_sample: list[int] = [1, 1, 2, 2, 4],
+        signal: list[float] = None,
+        n_sample: list[int] = None,
         val_size: float = 0.1,
         test_size: float = 0.1,
         random_state: int = 42,
@@ -86,8 +86,8 @@ class SyntheticDataLoader(LightningDataModule):
         self.batch_size = batch_size
         self.num_genes = num_genes
         self.num_tfs = sum(n_sample)  # sum of all n_sample is the number of TFs
-        self.signal = signal
-        self.n_sample = n_sample
+        self.signal = signal or [0.1, 0.15, 0.2, 0.25, 0.3]
+        self.n_sample = n_sample or [1 for _ in range(len(self.signal))]
         self.val_size = val_size
         self.test_size = test_size
         self.random_state = random_state
