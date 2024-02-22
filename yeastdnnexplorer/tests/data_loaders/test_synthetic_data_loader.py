@@ -1,13 +1,13 @@
 import pytest
-import torch
 from torch.utils.data import DataLoader
 
-from yeastdnnexplorer.ml_models.simple_model import SimpleModel
 from yeastdnnexplorer.data_loaders.synthetic_data_loader import SyntheticDataLoader
+
 
 @pytest.fixture
 def data_module():
     return SyntheticDataLoader()
+
 
 def test_data_loading(data_module):
     data_module.prepare_data()

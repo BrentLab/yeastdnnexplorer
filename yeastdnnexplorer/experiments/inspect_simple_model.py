@@ -1,14 +1,10 @@
-import sys
+"""Script to inspect the parameters of a trained model (passed in via a checkpoint
+file)"""
+
 import argparse
 
-import pytorch_lightning as pl
-from pytorch_lightning import seed_everything
 from yeastdnnexplorer.ml_models.simple_model import SimpleModel
-from yeastdnnexplorer.data_loaders.synthetic_data_loader import SyntheticDataLoader
 
-'''
-Script to inspect the parameters of a trained model (passed in via a checkpoint file)
-'''
 
 def main() -> None:
     args = parse_args_for_inspect_model_experiment()
@@ -18,13 +14,12 @@ def main() -> None:
 
     inspect_model_experiment(checkpoint_file_path)
 
+
 def inspect_model_experiment(checkpoint_file_path) -> None:
-    '''
-    Runs the simple experiement to inspect the parameters of a trained model
-    '''
-    
+    """Runs the simple experiement to inspect the parameters of a trained model."""
+
     # load the model from the checkpoint
-    model = SimpleModel.load_from_checkpoint(checkpoint_path = checkpoint_file_path)
+    model = SimpleModel.load_from_checkpoint(checkpoint_path=checkpoint_file_path)
 
     print("Model Hyperparameters===========================================")
     print(model.hparams)
@@ -36,17 +31,21 @@ def inspect_model_experiment(checkpoint_file_path) -> None:
 
 
 def parse_args_for_inspect_model_experiment() -> argparse.Namespace:
-    '''
-    Parses the command line arguments for the inspect_model_experiment function
-    Fails with error message if the required argument (checkpoint_file) is not provided
+    """
+    Parses the command line arguments for the inspect_model_experiment function Fails
+    with error message if the required argument (checkpoint_file) is not provided.
 
     :return: The parsed command line arguments
     :rtype: argparse.Namespace
-    '''
-    parser = argparse.ArgumentParser(description='Inspcting Model Parameters')
-    parser.add_argument('--checkpoint_file', type=str, action='store', required=True) # this will be the checkpoint file that we want to inspect
+
+    """
+    parser = argparse.ArgumentParser(description="Inspcting Model Parameters")
+    parser.add_argument(
+        "--checkpoint_file", type=str, action="store", required=True
+    )  # this will be the checkpoint file that we want to inspect
     args = parser.parse_args()
     return args
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
