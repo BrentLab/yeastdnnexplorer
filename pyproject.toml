@@ -11,6 +11,9 @@ python = "^3.11"
 torch = "^2.2.0"
 numpy = "^1.26.3"
 pandas = "^2.2.0"
+pytorch-lightning = "^2.1.4"
+scikit-learn = "1.4.0"
+tensorboard = "^2.16.1"
 
 
 [tool.poetry.group.dev.dependencies]

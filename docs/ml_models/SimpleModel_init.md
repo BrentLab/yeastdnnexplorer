@@ -1,0 +1,1 @@
+::: yeastdnnexplorer.ml_models.simple_model.SimpleModel
