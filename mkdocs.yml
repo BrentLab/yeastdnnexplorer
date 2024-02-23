@@ -38,6 +38,23 @@ nav:
       - probability_models/generate_pvalues.md
       - probability_models/generate_perturbation_effects.md
       - probability_models/default_perturbation_effect_adjustment_function.md
+- Experiments:
+- Models:
+  - SimpleModel:
+    - ml_models/SimpleModel_init.md
+    - ml_models/SimpleModel_forward.md
+    - ml_models/configure_optimizers.md
+    - ml_models/test_step.md
+    - ml_models/training_step.md
+    - ml_models/val_step.md
+- Data Loaders:
+  - SyntheticDataLoader:
+    - data_loaders/SyntheticDataLoader_init.md
+    - data_loaders/SyntheticDataLoader_prepare_data.md
+    - data_loaders/SyntheticDataLoader_setup.md
+    - data_loaders/test_dataloader.md
+    - data_loaders/train_dataloader.md
+    - data_loaders/val_dataloader.md
 
 markdown_extensions:
     - smarty
