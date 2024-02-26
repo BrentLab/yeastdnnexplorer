@@ -61,7 +61,7 @@ def simple_model_synthetic_data_experiment(
     data_module = SyntheticDataLoader(
         batch_size=batch_size,
         num_genes=1000,
-        signal=[0.1, 0.15, 0.2, 0.25, 0.3],
+        signal=[0.5] * 5,  # old: [0.1, 0.15, 0.2, 0.25, 0.3],
         n_sample=[1, 1, 2, 2, 4],
         val_size=0.1,
         test_size=0.1,

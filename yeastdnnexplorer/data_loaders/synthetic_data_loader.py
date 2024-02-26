@@ -24,6 +24,7 @@ class SyntheticDataLoader(LightningDataModule):
         batch_size: int = 32,
         num_genes: int = 1000,
         signal: list[float] | None = None,
+        signal_mean: float = 3.0,
         n_sample: list[int] | None = None,
         val_size: float = 0.1,
         test_size: float = 0.1,
@@ -50,6 +51,8 @@ class SyntheticDataLoader(LightningDataModule):
         :param random_state: The random seed to use for splitting the data (keep this
             consistent to ensure reproduceability)
         :type random_state: int
+        :param signal_mean: The mean of the signal distribution
+        :type signal_mean: float
         :raises TypeError: If batch_size is not an positive integer
         :raises TypeError: If num_genes is not an positive integer
         :raises TypeError: If signal is not a list of integers or floats
@@ -57,6 +60,7 @@ class SyntheticDataLoader(LightningDataModule):
         :raises TypeError: If val_size is not a float between 0 and 1 (inclusive)
         :raises TypeError: If test_size is not a float between 0 and 1 (inclusive)
         :raises TypeError: If random_state is not an integer
+        :raises TypeError: If signal_mean is not a float
         :raises ValueError: If val_size + test_size is greater than 1 (i.e. the splits
             are too large)
 
@@ -79,6 +83,8 @@ class SyntheticDataLoader(LightningDataModule):
             raise TypeError("test_size must be a float between 0 and 1 (inclusive)")
         if not isinstance(random_state, int):
             raise TypeError("random_state must be an integer")
+        if not isinstance(signal_mean, float):
+            raise TypeError("signal_mean must be a float")
         if test_size + val_size > 1:
             raise ValueError("val_size + test_size must be less than or equal to 1")
 
@@ -91,6 +97,7 @@ class SyntheticDataLoader(LightningDataModule):
         self.val_size = val_size
         self.test_size = test_size
         self.random_state = random_state
+        self.signal_mean = signal_mean
         self.final_data_tensor: torch.Tensor = None
         self.binding_effect_matrix: torch.Tensor | None = None
         self.perturbation_effect_matrix: torch.Tensor | None = None
@@ -133,7 +140,7 @@ class SyntheticDataLoader(LightningDataModule):
         binding_data_tensor = torch.stack(binding_data_combined, dim=1)
 
         perturbation_effects_list = [
-            generate_perturbation_effects(binding_data_tensor)
+            generate_perturbation_effects(binding_data_tensor, signal_mean=self.signal_mean) # old had no signal_mean
             for _ in range(sum(self.n_sample))
         ]
 
