@@ -16,6 +16,8 @@ scikit-learn = "1.4.0"
 tensorboard = "^2.16.1"
 torchsummary = "^1.5.1"
 jupyter = "^1.0.0"
+matplotlib = "^3.8.3"
+seaborn = "^0.13.2"
 
 
 [tool.poetry.group.dev.dependencies]
