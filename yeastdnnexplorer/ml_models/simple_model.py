@@ -48,7 +48,12 @@ class SimpleModel(pl.LightningModule):
         self.save_hyperparameters()
 
         # define layers for the model here
+        # self.activation = nn.ReLU()
+
         self.linear1 = nn.Linear(input_dim, output_dim)
+        # self.linear1 = nn.Linear(input_dim, 128)
+        # self.linear2 = nn.Linear(128, 32)
+        # self.linear3 = nn.Linear(32, output_dim)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -61,6 +66,10 @@ class SimpleModel(pl.LightningModule):
         :rtype: torch.Tensor
 
         """
+        # x = self.activation(self.linear1(x))
+        # x = self.activation(self.linear2(x))
+        # return self.linear3(x)
+
         return self.linear1(x)
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:

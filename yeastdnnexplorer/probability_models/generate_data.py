@@ -79,8 +79,8 @@ def generate_gene_population(
 def generate_binding_effects(
     gene_population: GenePopulation,
     background_hops_range: tuple[int, int] = (1, 100),
-    noise_experiment_hops_range: tuple[int, int] = (0, 1),
-    signal_experiment_hops_range: tuple[int, int] = (1, 6),
+    noise_experiment_hops_range: tuple[int, int] = (0, 1),  # old: (0, 1) # this is what I should modify to mess w the noise mean (don't touch this as much)
+    signal_experiment_hops_range: tuple[int, int] = (1, 6), # old: (1, 6) # this is what I should modify to mess w the signal mean
     total_background_hops: int = 1000,
     total_experiment_hops: int = 76,
     pseudocount: float = 1e-10,
@@ -125,6 +125,9 @@ def generate_binding_effects(
     """
     # NOTE: torch intervals are half open on the right, so we add 1 to the
     # high end of the range to make it inclusive
+
+    # print("bm - noise_experiment_hops_range" + str(noise_experiment_hops_range))
+    # print("bm - signal_experiment_hops_range" + str(signal_experiment_hops_range))
 
     # check input
     if not isinstance(gene_population, GenePopulation):
