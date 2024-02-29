@@ -288,6 +288,7 @@ def default_perturbation_effect_adjustment_function(
 
 def generate_perturbation_effects(
     binding_data: torch.Tensor,
+    tf_index: int,
     noise_mean: float = 0.0,
     noise_std: float = 1.0,
     signal_mean: float = 3.0,
@@ -310,6 +311,8 @@ def generate_perturbation_effects(
         where the entries in the third dimension are a matrix with columns
         [label, enrichment, pvalue].
     :type binding_data: torch.Tensor
+    :param tf_index: The index of the TF in the binding_data tensor.
+    :type tf_index: int
     :param noise_mean: The mean for noise genes. Defaults to 0.0
     :type noise_mean: float, optional
     :param noise_std: The standard deviation for noise genes. Defaults to 1.0
@@ -360,7 +363,7 @@ def generate_perturbation_effects(
             "(binding_enrichment_data, signal_mean, noise_mean, max_adjustment)"
         )
 
-    signal_mask = (binding_data[:, :, 0] == 1).any(dim=1)
+    signal_mask = binding_data[:, tf_index, 0] == 1
 
     # Initialize an effects tensor for all genes
     effects = torch.empty(

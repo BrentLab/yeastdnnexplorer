@@ -51,6 +51,7 @@ class SyntheticDataLoader(LightningDataModule):
         :param random_state: The random seed to use for splitting the data (keep this
             consistent to ensure reproduceability)
         :type random_state: int
+
         :param signal_mean: The mean of the signal distribution
         :type signal_mean: float
         :raises TypeError: If batch_size is not an positive integer
@@ -91,13 +92,13 @@ class SyntheticDataLoader(LightningDataModule):
         super().__init__()
         self.batch_size = batch_size
         self.num_genes = num_genes
-        self.num_tfs = sum(n_sample)  # sum of all n_sample is the number of TFs
+        self.signal_mean = signal_mean
         self.signal = signal or [0.1, 0.15, 0.2, 0.25, 0.3]
         self.n_sample = n_sample or [1 for _ in range(len(self.signal))]
+        self.num_tfs = sum(self.n_sample)  # sum of all n_sample is the number of TFs
         self.val_size = val_size
         self.test_size = test_size
         self.random_state = random_state
-        self.signal_mean = signal_mean
         self.final_data_tensor: torch.Tensor = None
         self.binding_effect_matrix: torch.Tensor | None = None
         self.perturbation_effect_matrix: torch.Tensor | None = None
@@ -139,13 +140,13 @@ class SyntheticDataLoader(LightningDataModule):
         # [num_genes, num_TFs, 3]
         binding_data_tensor = torch.stack(binding_data_combined, dim=1)
 
-        print('bm - creating perturbation effects list with signal_mean:', self.signal_mean)
-        print("bm - also signal is ", self.signal)
-        print('bm - and also n_sample is ', self.n_sample)
+        # print('bm - creating perturbation effects list with signal_mean:', self.signal_mean)
+        # print("bm - also signal is ", self.signal)
+        # print('bm - and also n_sample is ', self.n_sample)
 
         perturbation_effects_list = [
-            generate_perturbation_effects(binding_data_tensor, signal_mean=self.signal_mean) # old had no signal_mean
-            for _ in range(sum(self.n_sample))
+            generate_perturbation_effects(binding_data_tensor, signal_mean=self.signal_mean, tf_index=tf_index) # old had no signal_mean
+            for tf_index in range(sum(self.n_sample))
         ]
 
         # take absolute value, this is all we care about
