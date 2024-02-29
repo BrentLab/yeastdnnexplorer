@@ -1,5 +1,5 @@
 # local tmp files
-./tmp/*
+tmp/*
 # But do not ignore README.md in the tmp directory
 !/tmp/README.md
 
@@ -30,6 +30,10 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+
+# ignore any log folders anywhere in repo
+**/logs/
+**/lightning_logs/
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -156,6 +160,8 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+
+logs
 
 # PyCharm
 #  JetBrains specific template is maintained in a separate JetBrains.gitignore that can
