@@ -65,14 +65,16 @@ class SyntheticDataLoader(LightningDataModule):
             raise TypeError("batch_size must be a positive integer")
         if not isinstance(num_genes, int) or num_genes < 1:
             raise TypeError("num_genes must be a positive integer")
-        if not isinstance(signal, list) or not all(
-            isinstance(x, (int, float)) for x in signal
-        ):
-            raise TypeError("signal must be a list of integers or floats")
-        if not isinstance(n_sample, list) or not all(
-            isinstance(x, int) for x in n_sample
-        ):
-            raise TypeError("n_sample must be a list of integers")
+        # Ben -- check this. You are intending to allow the user to pass None, right?
+        # in the constructor, there is a default value of None for signal and n_sample
+        # if not isinstance(signal, list) or not all(
+        #     isinstance(x, (int, float)) for x in signal
+        # ):
+        #     raise TypeError("signal must be a list of integers or floats")
+        # if not isinstance(n_sample, list) or not all(
+        #     isinstance(x, int) for x in n_sample
+        # ):
+        #     raise TypeError("n_sample must be a list of integers")
         if not isinstance(val_size, (int, float)) or val_size <= 0 or val_size >= 1:
             raise TypeError("val_size must be a float between 0 and 1 (inclusive)")
         if not isinstance(test_size, (int, float)) or test_size <= 0 or test_size >= 1:
@@ -85,9 +87,11 @@ class SyntheticDataLoader(LightningDataModule):
         super().__init__()
         self.batch_size = batch_size
         self.num_genes = num_genes
-        self.num_tfs = sum(n_sample)  # sum of all n_sample is the number of TFs
+        # TODO: Ben -- re-ordering this since n_sample is used in num_tfs. If argument
+        # is `None`, then the default value is needed by num_tfs
         self.signal = signal or [0.1, 0.15, 0.2, 0.25, 0.3]
         self.n_sample = n_sample or [1 for _ in range(len(self.signal))]
+        self.num_tfs = sum(self.n_sample)  # sum of all n_sample is the number of TFs
         self.val_size = val_size
         self.test_size = test_size
         self.random_state = random_state
@@ -133,8 +137,8 @@ class SyntheticDataLoader(LightningDataModule):
         binding_data_tensor = torch.stack(binding_data_combined, dim=1)
 
         perturbation_effects_list = [
-            generate_perturbation_effects(binding_data_tensor)
-            for _ in range(sum(self.n_sample))
+            generate_perturbation_effects(binding_data_tensor, tf_index=tf_index)
+            for tf_index in range(sum(self.n_sample))
         ]
 
         perturbation_pvalue_list = [

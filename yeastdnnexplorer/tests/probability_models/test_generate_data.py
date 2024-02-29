@@ -105,6 +105,7 @@ def test_generate_perturbation_effects_with_and_without_adjustment():
     # First, test without mean adjustment
     effects_without_adjustment = generate_perturbation_effects(
         binding_data=binding_data,
+        tf_index=0,
         noise_mean=noise_mean,
         noise_std=noise_std,
         signal_mean=signal_mean,
@@ -143,6 +144,7 @@ def test_generate_perturbation_effects_with_and_without_adjustment():
     # Test with mean adjustment
     effects_with_adjustment = generate_perturbation_effects(
         binding_data=binding_data,
+        tf_index=0,
         noise_mean=noise_mean,
         noise_std=noise_std,
         signal_mean=signal_mean,
