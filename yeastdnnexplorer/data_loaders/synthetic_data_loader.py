@@ -139,10 +139,20 @@ class SyntheticDataLoader(LightningDataModule):
         # [num_genes, num_TFs, 3]
         binding_data_tensor = torch.stack(binding_data_combined, dim=1)
 
+        print('bm - creating perturbation effects list with signal_mean:', self.signal_mean)
+        print("bm - also signal is ", self.signal)
+        print('bm - and also n_sample is ', self.n_sample)
+
         perturbation_effects_list = [
             generate_perturbation_effects(binding_data_tensor, signal_mean=self.signal_mean) # old had no signal_mean
             for _ in range(sum(self.n_sample))
         ]
+
+        # take absolute value, this is all we care about
+        perturbation_effects_list = [torch.abs(perturbation_effects) for perturbation_effects in perturbation_effects_list]
+
+        # print('bm - PERTURBATION EFFECTS LIST')
+        # print(perturbation_effects_list)
 
         perturbation_pvalue_list = [
             generate_pvalues(perturbation_effects)
