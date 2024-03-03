@@ -70,14 +70,16 @@ class SyntheticDataLoader(LightningDataModule):
             raise TypeError("batch_size must be a positive integer")
         if not isinstance(num_genes, int) or num_genes < 1:
             raise TypeError("num_genes must be a positive integer")
-        if not isinstance(signal, list) or not all(
-            isinstance(x, (int, float)) for x in signal
-        ):
-            raise TypeError("signal must be a list of integers or floats")
-        if not isinstance(n_sample, list) or not all(
-            isinstance(x, int) for x in n_sample
-        ):
-            raise TypeError("n_sample must be a list of integers")
+        # Ben -- check this. You are intending to allow the user to pass None, right?
+        # in the constructor, there is a default value of None for signal and n_sample
+        # if not isinstance(signal, list) or not all(
+        #     isinstance(x, (int, float)) for x in signal
+        # ):
+        #     raise TypeError("signal must be a list of integers or floats")
+        # if not isinstance(n_sample, list) or not all(
+        #     isinstance(x, int) for x in n_sample
+        # ):
+        #     raise TypeError("n_sample must be a list of integers")
         if not isinstance(val_size, (int, float)) or val_size <= 0 or val_size >= 1:
             raise TypeError("val_size must be a float between 0 and 1 (inclusive)")
         if not isinstance(test_size, (int, float)) or test_size <= 0 or test_size >= 1:
