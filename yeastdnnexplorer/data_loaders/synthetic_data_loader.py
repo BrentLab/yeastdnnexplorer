@@ -2,6 +2,7 @@ import torch
 from pytorch_lightning import LightningDataModule
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset
+from collections.abc import Callable
 
 from yeastdnnexplorer.probability_models.generate_data import (
     generate_binding_effects,
@@ -29,6 +30,10 @@ class SyntheticDataLoader(LightningDataModule):
         val_size: float = 0.1,
         test_size: float = 0.1,
         random_state: int = 42,
+        max_mean_adjustment: float = 0.0,
+        adjustment_function: Callable[
+            [torch.Tensor, float, float, float, dict[int, list[int]]], torch.Tensor
+        ] | None = None,
     ) -> None:
         """
         Constructor of SyntheticDataLoader.
@@ -101,6 +106,10 @@ class SyntheticDataLoader(LightningDataModule):
         self.val_size = val_size
         self.test_size = test_size
         self.random_state = random_state
+
+        self.max_mean_adjustment = max_mean_adjustment
+        self.adjustment_function = adjustment_function
+
         self.final_data_tensor: torch.Tensor = None
         self.binding_effect_matrix: torch.Tensor | None = None
         self.perturbation_effect_matrix: torch.Tensor | None = None
@@ -142,20 +151,22 @@ class SyntheticDataLoader(LightningDataModule):
         # [num_genes, num_TFs, 3]
         binding_data_tensor = torch.stack(binding_data_combined, dim=1)
 
-        # print('bm - creating perturbation effects list with signal_mean:', self.signal_mean)
-        # print("bm - also signal is ", self.signal)
-        # print('bm - and also n_sample is ', self.n_sample)
-
-        perturbation_effects_list = [
-            generate_perturbation_effects(binding_data_tensor, signal_mean=self.signal_mean, tf_index=tf_index) # old had no signal_mean
-            for tf_index in range(sum(self.n_sample))
-        ]
+        if (self.adjustment_function):
+            print("bm - adjustment function provided to dataLoader setup")
+            perturbation_effects_list = [
+                generate_perturbation_effects(binding_data_tensor, signal_mean=self.signal_mean, tf_index=tf_index, max_mean_adjustment=self.max_mean_adjustment, adjustment_function=self.djustment_function)
+                for tf_index in range(sum(self.n_sample))
+            ]
+        else:
+            print("bm - no adjustment function provided to dataLoader setup")
+            perturbation_effects_list = [
+                generate_perturbation_effects(binding_data_tensor, signal_mean=self.signal_mean, tf_index=tf_index, max_mean_adjustment=self.max_mean_adjustment)
+                for tf_index in range(sum(self.n_sample))
+            ]
 
         # take absolute value, this is all we care about
         perturbation_effects_list = [torch.abs(perturbation_effects) for perturbation_effects in perturbation_effects_list]
 
-        # print('bm - PERTURBATION EFFECTS LIST')
-        # print(perturbation_effects_list)
 
         perturbation_pvalue_list = [
             generate_pvalues(perturbation_effects)
