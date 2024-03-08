@@ -57,7 +57,7 @@ class CustomizableModel(pl.LightningModule):
         
         self.input_layer = nn.Linear(input_dim, hidden_layer_sizes[0])
         self.hidden_layers = nn.ModuleList([])
-        for i in range(hidden_layer_num):
+        for i in range(hidden_layer_num - 1):
             self.hidden_layers.append(nn.Linear(hidden_layer_sizes[i], hidden_layer_sizes[i+1]))
         self.output_layer = nn.Linear(hidden_layer_sizes[-1], output_dim)
 

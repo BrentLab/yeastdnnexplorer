@@ -34,6 +34,7 @@ class SyntheticDataLoader(LightningDataModule):
         adjustment_function: Callable[
             [torch.Tensor, float, float, float, dict[int, list[int]]], torch.Tensor
         ] | None = None,
+        tf_relationships: dict[int, list[int]] | None = None,
     ) -> None:
         """
         Constructor of SyntheticDataLoader.
@@ -109,6 +110,7 @@ class SyntheticDataLoader(LightningDataModule):
 
         self.max_mean_adjustment = max_mean_adjustment
         self.adjustment_function = adjustment_function
+        self.tf_relationships = tf_relationships
 
         self.final_data_tensor: torch.Tensor = None
         self.binding_effect_matrix: torch.Tensor | None = None
@@ -154,7 +156,7 @@ class SyntheticDataLoader(LightningDataModule):
         if (self.adjustment_function):
             print("bm - adjustment function provided to dataLoader setup")
             perturbation_effects_list = [
-                generate_perturbation_effects(binding_data_tensor, signal_mean=self.signal_mean, tf_index=tf_index, max_mean_adjustment=self.max_mean_adjustment, adjustment_function=self.djustment_function)
+                generate_perturbation_effects(binding_data_tensor, signal_mean=self.signal_mean, tf_index=tf_index, max_mean_adjustment=self.max_mean_adjustment, adjustment_function=self.adjustment_function, tf_relationships=self.tf_relationships)
                 for tf_index in range(sum(self.n_sample))
             ]
         else:
