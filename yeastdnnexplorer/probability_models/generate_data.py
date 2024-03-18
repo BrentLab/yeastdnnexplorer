@@ -374,7 +374,6 @@ def perturbation_effect_adjustment_function_with_tf_relationships(
     # summing enrichment scores for each gene, taking into account tf relationships
     summed_enrichment_scores = torch.zeros_like(signal_enrichment_scores_only_zeros_elsewhere[:, 0])
 
-    # TODO try implementing with a nested for loop and then try to turn into a vectorized operation (pytorch) once that works?
     for gene_idx in range(signal_labels.shape[0]):
         # if the gene is bound (signal) for the current TF, and all the related TFs are also bound to that gene (signal), only then do we add that enrichment score to the sum
         # if the gene is not bound (noise) for the current TF, we don't add the enrichment score to the sum
@@ -501,10 +500,12 @@ def generate_perturbation_effects(
 
         # NOTE: different mean for each gene
         if adjustment_function == default_perturbation_effect_adjustment_function:
+            # print("bm - adjusting means with default function")
             adjusted_means = adjustment_function(
                 binding_data, signal_mean, noise_mean, max_mean_adjustment, None
             )
         else:
+            # print("bm - adjusting means with custom function")
             if tf_relationships is None:
                 raise ValueError("tf_relationships must be provided if a custom adjustment function is used")
             adjusted_means = adjustment_function(
@@ -513,6 +514,7 @@ def generate_perturbation_effects(
         # add adjustments, ensuring they respect the original sign
         effects = signs * torch.abs(torch.normal(mean=adjusted_means, std=signal_std))
     else:
+        # print("bm - not adjusting means")
         # Generate effects based on the noise and signal means, applying the sign
         effects[~signal_mask] = signs[~signal_mask] * torch.abs(
             torch.normal(

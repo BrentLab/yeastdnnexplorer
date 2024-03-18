@@ -7,7 +7,7 @@ license = "GPL-3.0"
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "3.11.5"
 torch = "^2.2.0"
 numpy = "^1.26.3"
 pandas = "^2.2.0"
@@ -16,8 +16,7 @@ scikit-learn = "1.4.0"
 tensorboard = "^2.16.1"
 
 torchsummary = "^1.5.1"
-
-
+optuna = "^3.6.0"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
@@ -44,7 +43,6 @@ pytest-mock = "^3.12.0"
 mkdocs-section-index = "^0.3.8"
 pytest-cov = "^4.1.0"
 mknotebooks = "^0.8.0"
-matplotlib = "^3.8.3"
 
 [tool.pytest.ini_options]
 minversion = "6.0"
@@ -61,6 +59,7 @@ omit = ["*/tests/*"]
 [tool.black]
 line-length = 88
 target-version = ['py311']
+include = '\.py$'
 
 [tool.isort]
 profile = "black"

@@ -50,10 +50,10 @@ class CustomizableModel(pl.LightningModule):
                 self.activation = nn.Sigmoid()
             case "Tanh":
                 self.activation = nn.Tanh()
-            case "LeakyRelU":
+            case "LeakyReLU":
                 self.activation = nn.LeakyReLU()
             case _:
-                raise ValueError("activation must be one of 'ReLU', 'Sigmoid', 'Tanh', 'LeakyRelU'")
+                raise ValueError("activation must be one of 'ReLU', 'Sigmoid', 'Tanh', 'LeakyReLU'")
         
         self.input_layer = nn.Linear(input_dim, hidden_layer_sizes[0])
         self.hidden_layers = nn.ModuleList([])
