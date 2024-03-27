@@ -55,7 +55,6 @@ class SimpleModel(pl.LightningModule):
         # self.linear2 = nn.Linear(128, 32)
         # self.linear3 = nn.Linear(32, output_dim)
 
-
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the model (i.e. how predictions are made for a given input)

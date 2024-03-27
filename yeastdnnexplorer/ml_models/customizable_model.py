@@ -7,25 +7,29 @@ from torch.optim import Optimizer
 
 
 class CustomizableModel(pl.LightningModule):
-    """ A class for a customizable model that takes in binding effects for each
-    transcription factor and predicts gene expression values 
-    This class contains all of the logic for setup, training, validation, and testing of the model, 
-    as well as defining how data is passed through the model 
-    It is a subclass of pytorch_lightning.LightningModule, which is similar to a regular PyTorch nn.module
-    but with added functionality for training and validation. 
-    This model takes in many more parameters that SimpleModel, allowing us to experiement with many
-    hyperparameter and architecture choices in order to decide what is best for our task & data
+    """
+    A class for a customizable model that takes in binding effects for each
+    transcription factor and predicts gene expression values This class contains all of
+    the logic for setup, training, validation, and testing of the model, as well as
+    defining how data is passed through the model It is a subclass of
+    pytorch_lightning.LightningModule, which is similar to a regular PyTorch nn.module
+    but with added functionality for training and validation.
+
+    This model takes in many more parameters that SimpleModel, allowing us to
+    experiement with many hyperparameter and architecture choices in order to decide
+    what is best for our task & data
+
     """
 
     def __init__(
-        self, 
-        input_dim: int, 
-        output_dim: int, 
+        self,
+        input_dim: int,
+        output_dim: int,
         lr: float = 0.001,
         hidden_layer_num: int = 1,
         hidden_layer_sizes: list = [128],
-        activation: str = "ReLU", # can be "ReLU", "Sigmoid", "Tanh", "LeakyRelU"
-        optimizer: str = "Adam", # can be "Adam", "SGD", "RMSprop"
+        activation: str = "ReLU",  # can be "ReLU", "Sigmoid", "Tanh", "LeakyRelU"
+        optimizer: str = "Adam",  # can be "Adam", "SGD", "RMSprop"
         L2_regularization_term: float = 0.0,
         dropout_rate: float = 0.0,
     ) -> None:
@@ -48,6 +52,7 @@ class CustomizableModel(pl.LightningModule):
         :type hidden_layer_num: int
         :param hidden_layer_sizes: The size of each hidden layer in the model
         :type hidden_layer_sizes: list
+
         """
         if not isinstance(input_dim, int):
             raise TypeError("input_dim must be an integer")
@@ -59,13 +64,28 @@ class CustomizableModel(pl.LightningModule):
             raise ValueError("input_dim and output_dim must be positive integers")
         if not isinstance(hidden_layer_num, int):
             raise TypeError("hidden_layer_num must be an integer")
-        if not isinstance(hidden_layer_sizes, list) or not all(isinstance(i, int) for i in hidden_layer_sizes):
+        if not isinstance(hidden_layer_sizes, list) or not all(
+            isinstance(i, int) for i in hidden_layer_sizes
+        ):
             raise TypeError("hidden_layer_sizes must be a list of integers")
         if len(hidden_layer_sizes) != hidden_layer_num:
-            raise ValueError("hidden_layer_sizes must have length equal to hidden_layer_num")
-        if not isinstance(activation, str) or activation not in ["ReLU", "Sigmoid", "Tanh", "LeakyReLU"]:
-            raise ValueError("activation must be one of 'ReLU', 'Sigmoid', 'Tanh', 'LeakyReLU'")
-        if not isinstance(optimizer, str) or optimizer not in ["Adam", "SGD", "RMSprop"]:
+            raise ValueError(
+                "hidden_layer_sizes must have length equal to hidden_layer_num"
+            )
+        if not isinstance(activation, str) or activation not in [
+            "ReLU",
+            "Sigmoid",
+            "Tanh",
+            "LeakyReLU",
+        ]:
+            raise ValueError(
+                "activation must be one of 'ReLU', 'Sigmoid', 'Tanh', 'LeakyReLU'"
+            )
+        if not isinstance(optimizer, str) or optimizer not in [
+            "Adam",
+            "SGD",
+            "RMSprop",
+        ]:
             raise ValueError("optimizer must be one of 'Adam', 'SGD', 'RMSprop'")
         if not isinstance(L2_regularization_term, float) or L2_regularization_term < 0:
             raise TypeError("L2_regularization_term must be a non-negative float")
@@ -92,16 +112,19 @@ class CustomizableModel(pl.LightningModule):
             case "LeakyReLU":
                 self.activation = nn.LeakyReLU()
             case _:
-                raise ValueError("activation must be one of 'ReLU', 'Sigmoid', 'Tanh', 'LeakyReLU'")
-        
+                raise ValueError(
+                    "activation must be one of 'ReLU', 'Sigmoid', 'Tanh', 'LeakyReLU'"
+                )
+
         self.input_layer = nn.Linear(input_dim, hidden_layer_sizes[0])
         self.hidden_layers = nn.ModuleList([])
         for i in range(hidden_layer_num - 1):
-            self.hidden_layers.append(nn.Linear(hidden_layer_sizes[i], hidden_layer_sizes[i+1]))
+            self.hidden_layers.append(
+                nn.Linear(hidden_layer_sizes[i], hidden_layer_sizes[i + 1])
+            )
         self.output_layer = nn.Linear(hidden_layer_sizes[-1], output_dim)
 
         self.dropout = nn.Dropout(p=dropout_rate)
-
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -190,10 +213,22 @@ class CustomizableModel(pl.LightningModule):
         """
         match self.optimizer:
             case "Adam":
-                return torch.optim.Adam(self.parameters(), lr=self.lr, weight_decay=self.L2_regularization_term)
+                return torch.optim.Adam(
+                    self.parameters(),
+                    lr=self.lr,
+                    weight_decay=self.L2_regularization_term,
+                )
             case "SGD":
-                return torch.optim.SGD(self.parameters(), lr=self.lr, weight_decay=self.L2_regularization_term)
+                return torch.optim.SGD(
+                    self.parameters(),
+                    lr=self.lr,
+                    weight_decay=self.L2_regularization_term,
+                )
             case "RMSprop":
-                return torch.optim.RMSprop(self.parameters(), lr=self.lr, weight_decay=self.L2_regularization_term)
+                return torch.optim.RMSprop(
+                    self.parameters(),
+                    lr=self.lr,
+                    weight_decay=self.L2_regularization_term,
+                )
             case _:
                 raise ValueError("optimizer must be one of 'Adam', 'SGD', 'RMSprop'")

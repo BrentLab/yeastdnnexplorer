@@ -79,8 +79,8 @@ def generate_gene_population(
 def generate_binding_effects(
     gene_population: GenePopulation,
     background_hops_range: tuple[int, int] = (1, 100),
-    noise_experiment_hops_range: tuple[int, int] = (0, 1),  # old: (0, 1) # this is what I should modify to mess w the noise mean (don't touch this as much)
-    signal_experiment_hops_range: tuple[int, int] = (1, 6), # old: (1, 6) # this is what I should modify to mess w the signal mean
+    noise_experiment_hops_range: tuple[int, int] = (0, 1),
+    signal_experiment_hops_range: tuple[int, int] = (1, 6),
     total_background_hops: int = 1000,
     total_experiment_hops: int = 76,
     pseudocount: float = 1e-10,
@@ -125,9 +125,6 @@ def generate_binding_effects(
     """
     # NOTE: torch intervals are half open on the right, so we add 1 to the
     # high end of the range to make it inclusive
-
-    # print("bm - noise_experiment_hops_range" + str(noise_experiment_hops_range))
-    # print("bm - signal_experiment_hops_range" + str(signal_experiment_hops_range))
 
     # check input
     if not isinstance(gene_population, GenePopulation):
@@ -229,18 +226,12 @@ def generate_pvalues(
     return pvalues
 
 
-# IDEA: could just add an argument that specifies which indices in the binding data to consider
-    # this could be randomly generated and passed in? but its not a requirement
-        # if randomly generated, need to output
-    # see my notes above the generate_perturbation_effects function
-
-
 def default_perturbation_effect_adjustment_function(
     binding_enrichment_data: torch.Tensor,
     signal_mean: float,
     noise_mean: float,
     max_adjustment: float,
-    tf_relationships: dict[int, list[int]] = None
+    tf_relationships: dict[int, list[int]] = {},
 ) -> torch.Tensor:
     """
     Default function to adjust the mean of the perturbation effect based on the
@@ -259,7 +250,8 @@ def default_perturbation_effect_adjustment_function(
     :type noise_mean: float
     :param max_adjustment: The maximum adjustment to the base mean based on enrichment.
     :type max_adjustment: float
-    :param tf_relationships: Unused in this function. It is only here to match the signature of the other adjustment functions.
+    :param tf_relationships: Unused in this function. It is only here to match the
+        signature of the other adjustment functions.
     :type tf_relationships: dict[int, list[int]], optional
     :return: Adjusted mean as a tensor.
     :rtype: torch.Tensor
@@ -269,43 +261,14 @@ def default_perturbation_effect_adjustment_function(
     signal_labels = binding_enrichment_data[:, :, 0]
     enrichment_scores = binding_enrichment_data[:, :, 1]
 
-    # would have to change below code to signal_labels == 1, and then tf_index is x, y, z
-        # choose which enrichment scores to lookat above
-            # in the second indexing argument for the above tensors
-        # enrichment score is essentially binding effect
-
-    # Set noise (label 0) enrichment scores to 0 and then sum across TFs
-
-    # NOTE: returns 0 for the enrichment score if the label is 0 (NOISE)
-        # else we keep the enrichment score
-        # for each gene (across all transcirption factors) we have this sum
-    
-    # print("bm - signal_labels shape")
-    # print(signal_labels.shape)
-
-    # print("bm - enrichment_scores shape")
-    # print(enrichment_scores.shape)
-    
     summed_enrichment_scores = torch.where(
         signal_labels == 1, enrichment_scores, torch.zeros_like(enrichment_scores)
     ).sum(dim=1)
-
-    # print("bm - summed enrichment scores shape")
-    # print(summed_enrichment_scores.shape)
-
-    # print("bm - summed enrichment scores")
-    # print(summed_enrichment_scores)
 
     # Normalize and transform summed enrichment scores
     scaled_scores = (summed_enrichment_scores - summed_enrichment_scores.min()) / (
         summed_enrichment_scores.max() - summed_enrichment_scores.min()
     )
-
-    # print("bm - scaled scores shape")
-    # print(scaled_scores.shape)
-
-    # print("bm - scaled scores")
-    # print(scaled_scores)
 
     # Apply a moderate exponential transformation to increase small differences
     transformed_scores = torch.sqrt(scaled_scores)
@@ -322,20 +285,8 @@ def default_perturbation_effect_adjustment_function(
     # NOTE: setting the noise genes to the noise mean
     adjusted_mean[signal_labels[:, 0] == 0] = noise_mean
 
-    # print("bm - final adjusted means shape")
-    # print(adjusted_mean.shape)
-
     return adjusted_mean
 
-# IDEA: this could take a dictionary (optional kwargs argument )
-    # {1: [3, 4]}  this would mean that we only adjust the mean for 1 if 3 and 4 are also signal genes
-        # ALL TFS (in this case [3,4]) must be bound AND 1 must be in signal group (bound) for the mean of 1 to be adjusted
-        # it should be all or nothing (mean is only adjusted if 3 and 4 are signal genes)
-        # also still need to only adjust 1 if it is a signal
-    # this (the kwargs or dict) would be passed into adjustmnet
-
-# NOTE!!!! When I say all the tfs, I mean that FOR THAT GENE, all the tfs must be bound
-    # meaning gene must be in signal group for all tfs !!!!!
 
 def perturbation_effect_adjustment_function_with_tf_relationships(
     binding_enrichment_data: torch.Tensor,
@@ -344,8 +295,9 @@ def perturbation_effect_adjustment_function_with_tf_relationships(
     max_adjustment: float,
     tf_relationships: dict[int, list[int]],
 ) -> torch.Tensor:
-    '''
-    Adjust the mean of the perturbation effect based on the enrichment score and the provided relationships between TFs.
+    """
+    Adjust the mean of the perturbation effect based on the enrichment score and the
+    provided relationships between TFs.
 
     :param binding_enrichment_data: A tensor of enrichment scores for each gene with
         dimensions [n_genes, n_tfs, 3] where the entries in the third dimension are a
@@ -357,12 +309,18 @@ def perturbation_effect_adjustment_function_with_tf_relationships(
     :type noise_mean: float
     :param max_adjustment: The maximum adjustment to the base mean based on enrichment.
     :type max_adjustment: float
-    :param tf_relationships: A dictionary where the keys are the indices of the TFs and the values are lists of indices of other TFs that are related to the key TF. For a key TF, the list of related TFs are the TFs that must be bound for the key TF to have its mean adjusted. Note that the key TF itself must also be bound for its mean to be adjusted, and note that by "a TF having its mean adjusted" we mean that the mean of the perturbation effect in that TF's column for the specific gene in question is adjusted.
+    :param tf_relationships: A dictionary where the keys are the indices of the TFs and
+        the values are lists of indices of other TFs that are related to the key TF. For
+        a key TF, the list of related TFs are the TFs that must be bound for the key TF
+        to have its mean adjusted. Note that the key TF itself must also be bound for
+        its mean to be adjusted, and note that by "a TF having its mean adjusted" we
+        mean that the mean of the perturbation effect in that TF's column for the
+        specific gene in question is adjusted.
     :type tf_relationships: dict[int, list[int]]
     :return: Adjusted mean as a tensor.
     :rtype: torch.Tensor
-    '''
-    # print("bm - got to tf relationships adjustment functon")
+
+    """
     # Extract signal/noise labels and enrichment scores
     signal_labels = binding_enrichment_data[:, :, 0]
     enrichment_scores = binding_enrichment_data[:, :, 1]
@@ -372,15 +330,26 @@ def perturbation_effect_adjustment_function_with_tf_relationships(
     )
 
     # summing enrichment scores for each gene, taking into account tf relationships
-    summed_enrichment_scores = torch.zeros_like(signal_enrichment_scores_only_zeros_elsewhere[:, 0])
+    summed_enrichment_scores = torch.zeros_like(
+        signal_enrichment_scores_only_zeros_elsewhere[:, 0]
+    )
 
     for gene_idx in range(signal_labels.shape[0]):
-        # if the gene is bound (signal) for the current TF, and all the related TFs are also bound to that gene (signal), only then do we add that enrichment score to the sum
-        # if the gene is not bound (noise) for the current TF, we don't add the enrichment score to the sum
-        # if the gene is bound (signal) for the current TF, but not all the related TFs are bound to that gene (signal), we don't add the enrichment score to the sum
+        # if the gene is bound (signal) for the current TF
+        # and all the related TFs are also bound to that gene (signal)
+        # only then do we add that enrichment score to the sum
+        # if the gene is not bound (noise) for the current TF
+        # we don't add the enrichment score to the sum
+        # if the gene is bound (signal) for the current TF
+        # but not all the related TFs are bound to that gene (signal)
+        # we don't add the enrichment score to the sum
         for tf_index, related_tfs in tf_relationships.items():
-            if signal_labels[gene_idx, tf_index] == 1 and torch.all(signal_labels[gene_idx, related_tfs] == 1):
-                summed_enrichment_scores[gene_idx] += signal_enrichment_scores_only_zeros_elsewhere[gene_idx, tf_index]
+            if signal_labels[gene_idx, tf_index] == 1 and torch.all(
+                signal_labels[gene_idx, related_tfs] == 1
+            ):
+                summed_enrichment_scores[
+                    gene_idx
+                ] += signal_enrichment_scores_only_zeros_elsewhere[gene_idx, tf_index]
             else:
                 summed_enrichment_scores[gene_idx] += noise_mean
 
@@ -402,6 +371,7 @@ def perturbation_effect_adjustment_function_with_tf_relationships(
 
     return adjusted_mean
 
+
 def generate_perturbation_effects(
     binding_data: torch.Tensor,
     tf_index: int,
@@ -413,7 +383,7 @@ def generate_perturbation_effects(
     adjustment_function: Callable[
         [torch.Tensor, float, float, float, dict[int, list[int]]], torch.Tensor
     ] = default_perturbation_effect_adjustment_function,
-    tf_relationships: dict[int, list[int]] = None,
+    tf_relationships: dict[int, list[int]] = {},
 ) -> torch.Tensor:
     """
     Generate perturbation effects for genes.
@@ -438,7 +408,16 @@ def generate_perturbation_effects(
     :type signal_mean: float, optional
     :param signal_std: The standard deviation for signal genes. Defaults to 1.0
     :type signal_std: float, optional
-    :param tf_relationships: A dictionary where the keys are the indices of the TFs and the values are lists of indices of other TFs that are related to the key TF. For a key TF, the list of related TFs are the TFs that must be bound for the key TF to have its mean adjusted. Note that the key TF itself must also be bound for its mean to be adjusted, and note that by "a TF having its mean adjusted" we mean that the mean of the perturbation effect in that TF's column for the specific gene in question is adjusted.
+    :param tf_relationships: A dictionary where the keys are the indices of the TFs
+                             and the values are lists of indices of other TFs that
+                             are related to the key TF. For a key TF, the list of
+                             related TFs are the TFs that must be bound for the key
+                             TF to have its mean adjusted.
+                             Note that the key TF itself must also be bound for its
+                             mean to be adjusted, and note that by "a TF having its
+                             mean adjusted" we mean that the mean of the perturbation
+                             effect in that TF's column for the specific gene in
+                             question is adjusted.
     :type tf_relationships: dict[int, list[int]], optional
     :param max_mean_adjustment: The maximum adjustment to the base mean based
         on enrichment. Defaults to 0.0
@@ -502,21 +481,25 @@ def generate_perturbation_effects(
 
         # NOTE: different mean for each gene
         if adjustment_function == default_perturbation_effect_adjustment_function:
-            # print("bm - adjusting means with default function")
-            adjusted_means = adjustment_function(
-                binding_data, signal_mean, noise_mean, max_mean_adjustment, None
+            adjusted_means = default_perturbation_effect_adjustment_function(
+                binding_data, signal_mean, noise_mean, max_mean_adjustment
             )
         else:
-            # print("bm - adjusting means with custom function")
             if tf_relationships is None:
-                raise ValueError("tf_relationships must be provided if a custom adjustment function is used")
+                raise ValueError(
+                    "tf_relationships must be provided \
+                    if a custom adjustment function is used"
+                )
             adjusted_means = adjustment_function(
-                binding_data, signal_mean, noise_mean, max_mean_adjustment, tf_relationships
+                binding_data,
+                signal_mean,
+                noise_mean,
+                max_mean_adjustment,
+                tf_relationships,
             )
         # add adjustments, ensuring they respect the original sign
         effects = signs * torch.abs(torch.normal(mean=adjusted_means, std=signal_std))
     else:
-        # print("bm - not adjusting means")
         # Generate effects based on the noise and signal means, applying the sign
         effects[~signal_mask] = signs[~signal_mask] * torch.abs(
             torch.normal(

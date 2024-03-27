@@ -1,8 +1,9 @@
+from collections.abc import Callable
+
 import torch
 from pytorch_lightning import LightningDataModule
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset
-from collections.abc import Callable
 
 from yeastdnnexplorer.probability_models.generate_data import (
     generate_binding_effects,
@@ -24,17 +25,18 @@ class SyntheticDataLoader(LightningDataModule):
         self,
         batch_size: int = 32,
         num_genes: int = 1000,
-        signal: list[float] | None = None,
+        signal: list[float] = [0.1, 0.2, 0.2, 0.4, 0.5],
         signal_mean: float = 3.0,
-        n_sample: list[int] | None = None,
+        n_sample: list[int] = [1, 2, 2, 4, 4],
         val_size: float = 0.1,
         test_size: float = 0.1,
         random_state: int = 42,
         max_mean_adjustment: float = 0.0,
         adjustment_function: Callable[
             [torch.Tensor, float, float, float, dict[int, list[int]]], torch.Tensor
-        ] | None = None,
-        tf_relationships: dict[int, list[int]] | None = None,
+        ]
+        | None = None,
+        tf_relationships: dict[int, list[int]] = {},
     ) -> None:
         """
         Constructor of SyntheticDataLoader.
@@ -57,9 +59,15 @@ class SyntheticDataLoader(LightningDataModule):
         :param random_state: The random seed to use for splitting the data (keep this
             consistent to ensure reproduceability)
         :type random_state: int
-
         :param signal_mean: The mean of the signal distribution
         :type signal_mean: float
+        :param max_mean_adjustment: The maximum mean adjustment to apply to the mean
+                                    of the signal (bound) perturbation effects
+        :type max_mean_adjustment: float
+        :param adjustment_function: A function that adjusts the mean of the signal
+                                    (bound) perturbation effects
+        :type adjustment_function: Callable[[torch.Tensor, float, float,
+                                   float, dict[int, list[int]]], torch.Tensor]
         :raises TypeError: If batch_size is not an positive integer
         :raises TypeError: If num_genes is not an positive integer
         :raises TypeError: If signal is not a list of integers or floats
@@ -76,16 +84,14 @@ class SyntheticDataLoader(LightningDataModule):
             raise TypeError("batch_size must be a positive integer")
         if not isinstance(num_genes, int) or num_genes < 1:
             raise TypeError("num_genes must be a positive integer")
-        # Ben -- check this. You are intending to allow the user to pass None, right?
-        # in the constructor, there is a default value of None for signal and n_sample
-        # if not isinstance(signal, list) or not all(
-        #     isinstance(x, (int, float)) for x in signal
-        # ):
-        #     raise TypeError("signal must be a list of integers or floats")
-        # if not isinstance(n_sample, list) or not all(
-        #     isinstance(x, int) for x in n_sample
-        # ):
-        #     raise TypeError("n_sample must be a list of integers")
+        if not isinstance(signal, list) or not all(
+            isinstance(x, (int, float)) for x in signal
+        ):
+            raise TypeError("signal must be a list of integers or floats")
+        if not isinstance(n_sample, list) or not all(
+            isinstance(x, int) for x in n_sample
+        ):
+            raise TypeError("n_sample must be a list of integers")
         if not isinstance(val_size, (int, float)) or val_size <= 0 or val_size >= 1:
             raise TypeError("val_size must be a float between 0 and 1 (inclusive)")
         if not isinstance(test_size, (int, float)) or test_size <= 0 or test_size >= 1:
@@ -153,22 +159,34 @@ class SyntheticDataLoader(LightningDataModule):
         # [num_genes, num_TFs, 3]
         binding_data_tensor = torch.stack(binding_data_combined, dim=1)
 
-        if (self.adjustment_function):
-            print("bm - adjustment function provided to dataLoader setup")
+        if self.adjustment_function:
             perturbation_effects_list = [
-                generate_perturbation_effects(binding_data_tensor, signal_mean=self.signal_mean, tf_index=tf_index, max_mean_adjustment=self.max_mean_adjustment, adjustment_function=self.adjustment_function, tf_relationships=self.tf_relationships)
+                generate_perturbation_effects(
+                    binding_data_tensor,
+                    signal_mean=self.signal_mean,
+                    tf_index=tf_index,
+                    max_mean_adjustment=self.max_mean_adjustment,
+                    adjustment_function=self.adjustment_function,
+                    tf_relationships=self.tf_relationships,
+                )
                 for tf_index in range(sum(self.n_sample))
             ]
         else:
-            print("bm - no adjustment function provided to dataLoader setup")
             perturbation_effects_list = [
-                generate_perturbation_effects(binding_data_tensor, signal_mean=self.signal_mean, tf_index=tf_index, max_mean_adjustment=self.max_mean_adjustment)
+                generate_perturbation_effects(
+                    binding_data_tensor,
+                    signal_mean=self.signal_mean,
+                    tf_index=tf_index,
+                    max_mean_adjustment=self.max_mean_adjustment,
+                )
                 for tf_index in range(sum(self.n_sample))
             ]
 
         # take absolute value, this is all we care about
-        perturbation_effects_list = [torch.abs(perturbation_effects) for perturbation_effects in perturbation_effects_list]
-
+        perturbation_effects_list = [
+            torch.abs(perturbation_effects)
+            for perturbation_effects in perturbation_effects_list
+        ]
 
         perturbation_pvalue_list = [
             generate_pvalues(perturbation_effects)
