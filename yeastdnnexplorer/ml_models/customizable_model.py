@@ -7,7 +7,15 @@ from torch.optim import Optimizer
 
 
 class CustomizableModel(pl.LightningModule):
-    """ docstring here """
+    """ A class for a customizable model that takes in binding effects for each
+    transcription factor and predicts gene expression values 
+    This class contains all of the logic for setup, training, validation, and testing of the model, 
+    as well as defining how data is passed through the model 
+    It is a subclass of pytorch_lightning.LightningModule, which is similar to a regular PyTorch nn.module
+    but with added functionality for training and validation. 
+    This model takes in many more parameters that SimpleModel, allowing us to experiement with many
+    hyperparameter and architecture choices in order to decide what is best for our task & data
+    """
 
     def __init__(
         self, 
@@ -23,6 +31,23 @@ class CustomizableModel(pl.LightningModule):
     ) -> None:
         """
         Constructor of CustomizableModel.
+
+        :param input_dim: The number of input features to our model, these are the
+            binding effects for each transcription factor for a specific gene
+        :type input_dim: int
+        :param output_dim: The number of output features of our model, this is the
+            predicted gene expression value for each TF
+        :type output_dim: int
+        :param lr: The learning rate for the optimizer
+        :type lr: float
+        :raises TypeError: If input_dim is not an integer
+        :raises TypeError: If output_dim is not an integer
+        :raises TypeError: If lr is not a positive float
+        :raises ValueError: If input_dim or output_dim are not positive
+        :param hidden_layer_num: The number of hidden layers in the model
+        :type hidden_layer_num: int
+        :param hidden_layer_sizes: The size of each hidden layer in the model
+        :type hidden_layer_sizes: list
         """
         if not isinstance(input_dim, int):
             raise TypeError("input_dim must be an integer")
@@ -32,6 +57,20 @@ class CustomizableModel(pl.LightningModule):
             raise TypeError("lr must be a positive float")
         if input_dim < 1 or output_dim < 1:
             raise ValueError("input_dim and output_dim must be positive integers")
+        if not isinstance(hidden_layer_num, int):
+            raise TypeError("hidden_layer_num must be an integer")
+        if not isinstance(hidden_layer_sizes, list) or not all(isinstance(i, int) for i in hidden_layer_sizes):
+            raise TypeError("hidden_layer_sizes must be a list of integers")
+        if len(hidden_layer_sizes) != hidden_layer_num:
+            raise ValueError("hidden_layer_sizes must have length equal to hidden_layer_num")
+        if not isinstance(activation, str) or activation not in ["ReLU", "Sigmoid", "Tanh", "LeakyReLU"]:
+            raise ValueError("activation must be one of 'ReLU', 'Sigmoid', 'Tanh', 'LeakyReLU'")
+        if not isinstance(optimizer, str) or optimizer not in ["Adam", "SGD", "RMSprop"]:
+            raise ValueError("optimizer must be one of 'Adam', 'SGD', 'RMSprop'")
+        if not isinstance(L2_regularization_term, float) or L2_regularization_term < 0:
+            raise TypeError("L2_regularization_term must be a non-negative float")
+        if not isinstance(dropout_rate, float) or dropout_rate < 0 or dropout_rate > 1:
+            raise TypeError("dropout_rate must be a float between 0 and 1")
 
         super().__init__()
         self.input_dim = input_dim
