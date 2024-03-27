@@ -381,6 +381,8 @@ def perturbation_effect_adjustment_function_with_tf_relationships(
         for tf_index, related_tfs in tf_relationships.items():
             if signal_labels[gene_idx, tf_index] == 1 and torch.all(signal_labels[gene_idx, related_tfs] == 1):
                 summed_enrichment_scores[gene_idx] += signal_enrichment_scores_only_zeros_elsewhere[gene_idx, tf_index]
+            else:
+                summed_enrichment_scores[gene_idx] += noise_mean
 
     # Normalize and transform summed enrichment scores
     scaled_scores = (summed_enrichment_scores - summed_enrichment_scores.min()) / (
