@@ -4,6 +4,7 @@ import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 from torch.optim import Optimizer
+from torchmetrics import MeanSquaredError, MeanAbsoluteError, R2Score
 
 
 class CustomizableModel(pl.LightningModule):
@@ -100,6 +101,7 @@ class CustomizableModel(pl.LightningModule):
         self.hidden_layer_sizes = hidden_layer_sizes
         self.optimizer = optimizer
         self.L2_regularization_term = L2_regularization_term
+        self.r2 = R2Score()
         self.save_hyperparameters()
 
         match activation:
@@ -142,6 +144,25 @@ class CustomizableModel(pl.LightningModule):
             x = self.dropout(self.activation(hidden_layer(x)))
         x = self.output_layer(x)
         return x
+    
+    def compute_nrmse(self, y_pred, y_true):
+        """
+        Compute the Normalized Root Mean Squared Error.
+        This can be used to objectively compare models when the variance of the distribution is varied
+
+        :param y_pred: The predicted y values
+        :type y_pred: torch.Tensor
+        :param y_true: The true y values
+        :type y_true: torch.Tensor
+        :return: The normalized root mean squared error
+        :rtype: torch.Tensor
+        """
+        rmse = torch.sqrt(nn.functional.mse_loss(y_pred, y_true))
+
+        # normalize with the range of true y values
+        y_range = y_true.max() - y_true.min()
+        nrmse = rmse / y_range
+        return nrmse
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
         """
@@ -158,9 +179,10 @@ class CustomizableModel(pl.LightningModule):
         """
         x, y = batch
         y_pred = self(x)
-        loss = nn.functional.mse_loss(y_pred, y)
-        self.log("train_loss", loss)
-        return loss
+        mse_loss = nn.functional.mse_loss(y_pred, y)
+        self.log("train_mse", mse_loss)
+        self.log("train_nrmse", self.compute_nrmse(y_pred, y))
+        return mse_loss
 
     def validation_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
         """
@@ -177,9 +199,10 @@ class CustomizableModel(pl.LightningModule):
         """
         x, y = batch
         y_pred = self(x)
-        loss = nn.functional.mse_loss(y_pred, y)
-        self.log("val_loss", loss)
-        return loss
+        mse_loss = nn.functional.mse_loss(y_pred, y)
+        self.log("val_mse", mse_loss)
+        self.log("val_nrmse", self.compute_nrmse(y_pred, y))
+        return mse_loss
 
     def test_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
         """
@@ -199,9 +222,10 @@ class CustomizableModel(pl.LightningModule):
         """
         x, y = batch
         y_pred = self(x)
-        loss = nn.functional.mse_loss(y_pred, y)
-        self.log("test_loss", loss)
-        return loss
+        mse_loss = nn.functional.mse_loss(y_pred, y)
+        self.log("test_mse", mse_loss)
+        self.log("test_nrmse", self.compute_nrmse(y_pred, y))
+        return mse_loss
 
     def configure_optimizers(self) -> Optimizer:
         """
