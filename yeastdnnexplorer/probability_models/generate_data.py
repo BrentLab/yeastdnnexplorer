@@ -4,6 +4,8 @@ from collections.abc import Callable
 
 import torch
 
+from yeastdnnexplorer.probability_models.relation_classes import Relation, And, Or
+
 logger = logging.getLogger(__name__)
 
 
@@ -288,6 +290,64 @@ def default_perturbation_effect_adjustment_function(
     return adjusted_mean
 
 
+def perturbation_effect_adjustment_function_with_tf_relationships_boolean_logic(
+    binding_enrichment_data: torch.Tensor,
+    signal_mean: float,
+    noise_mean: float,
+    max_adjustment: float,
+    tf_relationships: dict[int, list[Relation]],
+) -> torch.Tensor:
+    """
+    Adjust the mean of the perturbation effect based on the enrichment score and the
+    provided relationships between TFs.
+
+    Unlie the other TF adjustment functions, this function supports boolean logic,
+    meaning that we could do something like (for a specific gene) "adjust the mean of
+    TF1 if (TF2 OR TF3) are bound" (and TF1 is bound as well) or "adjust the mean of TF1
+    if ((TF2 && TF3) || TF4) are bound"
+    """
+    # Extract signal/noise labels and enrichment scores
+    signal_labels = binding_enrichment_data[:, :, 0]
+    enrichment_scores = binding_enrichment_data[:, :, 1]
+
+    signal_enrichment_scores_only_zeros_elsewhere = torch.where(
+        signal_labels == 1, enrichment_scores, torch.zeros_like(enrichment_scores)
+    )
+
+    # summing enrichment scores for each gene, taking into account tf relationships
+    summed_enrichment_scores = torch.zeros_like(
+        signal_enrichment_scores_only_zeros_elsewhere[:, 0]
+    )
+
+    for gene_idx in range(signal_labels.shape[0]):
+        for tf_index, relations in tf_relationships.items():
+            # we only adjust the mean if all of the corresponding relations are true and the gene is bound
+            if signal_labels[gene_idx, tf_index] == 1 and all(relation.evaluate(signal_labels[gene_idx].tolist()) for relation in relations):
+                summed_enrichment_scores[
+                    gene_idx
+                ] += signal_enrichment_scores_only_zeros_elsewhere[gene_idx, tf_index]
+            else:
+                summed_enrichment_scores[gene_idx] += noise_mean
+
+    # Normalize and transform summed enrichment scores
+    scaled_scores = (summed_enrichment_scores - summed_enrichment_scores.min()) / (
+        summed_enrichment_scores.max() - summed_enrichment_scores.min()
+    )
+
+    # Apply a moderate exponential transformation to increase small differences
+    transformed_scores = torch.sqrt(scaled_scores)
+
+    adjusted_scores = transformed_scores * max_adjustment
+
+    adjusted_mean = signal_mean + torch.where(
+        signal_labels[:, 0] == 1, adjusted_scores, torch.zeros_like(adjusted_scores)
+    )
+
+    adjusted_mean[signal_labels[:, 0] == 0] = noise_mean
+
+    return adjusted_mean
+
+
 def perturbation_effect_adjustment_function_with_tf_relationships(
     binding_enrichment_data: torch.Tensor,
     signal_mean: float,
@@ -382,8 +442,10 @@ def generate_perturbation_effects(
     max_mean_adjustment: float = 0.0,
     adjustment_function: Callable[
         [torch.Tensor, float, float, float, dict[int, list[int]]], torch.Tensor
+    ] | Callable[
+        [torch.Tensor, float, float, float, dict[int, list[Relation]]], torch.Tensor
     ] = default_perturbation_effect_adjustment_function,
-    tf_relationships: dict[int, list[int]] = {},
+    tf_relationships: dict[int, list[int] | list[Relation]] = {},
 ) -> torch.Tensor:
     """
     Generate perturbation effects for genes.
@@ -418,7 +480,7 @@ def generate_perturbation_effects(
                              mean adjusted" we mean that the mean of the perturbation
                              effect in that TF's column for the specific gene in
                              question is adjusted.
-    :type tf_relationships: dict[int, list[int]], optional
+    :type tf_relationships: dict[int, list[int] | list[Relation]], optional
     :param max_mean_adjustment: The maximum adjustment to the base mean based
         on enrichment. Defaults to 0.0
     :type max_mean_adjustment: float, optional
