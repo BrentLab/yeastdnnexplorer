@@ -17,6 +17,7 @@ tensorboard = "^2.16.1"
 
 torchsummary = "^1.5.1"
 optuna = "^3.6.0"
+optuna-dashboard = "^0.15.1"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
