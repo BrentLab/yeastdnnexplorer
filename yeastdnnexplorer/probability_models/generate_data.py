@@ -539,9 +539,6 @@ def generate_perturbation_effects(
 
     # Apply adjustments to the base mean for the signal genes, if necessary
     if max_mean_adjustment > 0 and adjustment_function is not None:
-        # Assuming adjustment_function returns an adjustment factor for each gene
-
-        # NOTE: different mean for each gene
         if adjustment_function == default_perturbation_effect_adjustment_function:
             adjusted_means = default_perturbation_effect_adjustment_function(
                 binding_data, signal_mean, noise_mean, max_mean_adjustment
