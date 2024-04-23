@@ -1,6 +1,6 @@
 class Relation:
     """
-    Bass class for relations between TF indices
+    Base class for relations between TF indices
     """
     def evaluate(self, bound_vec: list[int]):
         raise NotImplementedError
@@ -22,7 +22,7 @@ class And(Relation):
         Returns true if the And() condition evaluates to true
         Evaluates nested conditions as needed
 
-        :param bound_vec: Vector of TF indices (0 or 1) indicating which TFs are activated
+        :param bound_vec: Vector of TF indices (0 or 1) indicating which TFs are bound for the gene in question
         :type bound_vec: List[float]
         """
         if type(bound_vec) is not list or not all(isinstance(x, float) for x in bound_vec):
@@ -33,6 +33,9 @@ class And(Relation):
 
         # Each condition can be an index or another Relation (And/Or)
         return all(c.evaluate(bound_vec) if isinstance(c, Relation) else bound_vec[c] for c in self.conditions)
+    
+    def __str__(self):
+        return f"AND({', '.join(str(c) for c in self.conditions)})"
 
 class Or(Relation):
     def __init__(self, *conditions):
@@ -47,7 +50,7 @@ class Or(Relation):
         Returns true if the Or() condition evaluates to true
         Evaluates nested conditions as needed
 
-        :param bound_vec: Vector of TF indices (0 or 1) indicating which TFs are activated
+        :param bound_vec: Vector of TF indices (0 or 1) indicating which TFs are bound for the gene in question
         :type bound_vec: List[int]
         """
         if type(bound_vec) is not list or not all(isinstance(x, float) for x in bound_vec):
@@ -58,6 +61,9 @@ class Or(Relation):
         
         # Each condition can be an index or another Relation (And/Or)
         return any(c.evaluate(bound_vec) if isinstance(c, Relation) else bound_vec[c] for c in self.conditions)
+    
+    def __str__(self):
+        return f"OR({', '.join(str(c) for c in self.conditions)})"
     
 # EXAMPLE USAGE: 
 # Defining a complex condition:
