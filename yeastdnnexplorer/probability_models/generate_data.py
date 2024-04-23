@@ -228,7 +228,7 @@ def generate_pvalues(
     return pvalues
 
 
-def default_perturbation_effect_adjustment_function(
+def default_perturbation_effect_adjustment_function_old(
     binding_enrichment_data: torch.Tensor,
     signal_mean: float,
     noise_mean: float,
@@ -288,6 +288,59 @@ def default_perturbation_effect_adjustment_function(
     adjusted_mean[signal_labels[:, 0] == 0] = noise_mean
 
     return adjusted_mean
+
+def default_perturbation_effect_adjustment_function(
+    binding_enrichment_data: torch.Tensor,
+    signal_mean: float,
+    noise_mean: float,
+    max_adjustment: float,
+    **kwargs,
+) -> torch.Tensor:
+    """
+    Default function to adjust the mean of the perturbation effect based on the
+    enrichment score.
+
+    All functions that are passed to generate_perturbation_effects() in the argument
+    adjustment_function must have the same signature as this function.
+
+    :param binding_enrichment_data: A tensor of enrichment scores for each gene with
+        dimensions [n_genes, n_tfs, 3] where the entries in the third dimension are a
+        matrix with columns [label, enrichment, pvalue].
+    :type binding_enrichment_data: torch.Tensor
+    :param signal_mean: The mean for signal genes.
+    :type signal_mean: float
+    :param noise_mean: The mean for noise genes.
+    :type noise_mean: float
+    :param max_adjustment: The maximum adjustment to the base mean based on enrichment.
+    :type max_adjustment: float
+    :param tf_relationships: Unused in this function. It is only here to match the
+        signature of the other adjustment functions.
+    :type tf_relationships: dict[int, list[int]], optional
+    :return: Adjusted mean as a tensor.
+    :rtype: torch.Tensor
+
+    """
+    # Extract signal/noise labels and enrichment scores
+    signal_labels = binding_enrichment_data[:, :, 0]
+    enrichment_scores = binding_enrichment_data[:, :, 1]
+
+    adjusted_mean_matrix = torch.where(
+        signal_labels == 1, enrichment_scores, torch.zeros_like(enrichment_scores)
+    )
+
+    for gene_idx in range(signal_labels.shape[0]):
+        for tf_index in range(signal_labels.shape[1]):
+            if signal_labels[gene_idx, tf_index] == 1:
+                # draw a random value between 0 and 1 to use to control magnitude of adjustment
+                adjustment_multiplier = torch.rand(1)
+
+                # randomly adjust the gene by some portion of the max adjustment
+                adjusted_mean_matrix[gene_idx, tf_index] = signal_mean + (adjustment_multiplier * max_adjustment)
+            else:
+                # related tfs are not all bound, so set the enrichment score to noise mean
+                adjusted_mean_matrix[gene_idx, tf_index] = noise_mean
+
+    return adjusted_mean_matrix
 
 def perturbation_effect_adjustment_function_with_tf_relationships_boolean_logic(
     binding_enrichment_data: torch.Tensor,
@@ -516,11 +569,7 @@ def generate_perturbation_effects(
             "(binding_enrichment_data, signal_mean, noise_mean, max_adjustment)"
         )
 
-    # TODO will need to change this back !!!
-    #if adjustment_function is default_perturbation_effect_adjustment_function or None:
     signal_mask = binding_data[:, tf_index, 0] == 1
-    # else:
-    #     signal_mask = binding_data[:, :, 0] == 1
 
     # Initialize an effects tensor for all genes
     effects = torch.empty(
@@ -548,8 +597,6 @@ def generate_perturbation_effects(
         )
 
         # add adjustments, ensuring they respect the original sign
-        # print("bm - about to compute effects")
-        # TODO need to make it work for the default fn
         if adjusted_means.ndim == 1:
             effects = signs * torch.abs(torch.normal(mean=adjusted_means, std=signal_std))
         else:
@@ -558,11 +605,6 @@ def generate_perturbation_effects(
                 effects[:, col_idx] = signs * torch.abs(
                     torch.normal(mean=adjusted_means[:, col_idx], std=signal_std)
                 )
-        # TODO iterate over TFs and turn back into matrix
-        # just make a matrix of 0s of expected dimensions and then fill it in
-        # once this is done, go through and multiply each col by the sign vector (signs has an entry for each gene)
-        # effects = signs * torch.abs(torch.normal(mean=adjusted_means, std=signal_std))
-        # print("bm - effects computed: ", effects)
     else:
         # Generate effects based on the noise and signal means, applying the sign
         effects[~signal_mask] = signs[~signal_mask] * torch.abs(
