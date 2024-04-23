@@ -4,8 +4,8 @@ import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 from torch.optim import Optimizer
-
 from torchmetrics import MeanAbsolutePercentageError, R2Score
+
 
 class SimpleModel(pl.LightningModule):
     """A class for a simple linear model that takes in binding effects for each
@@ -55,8 +55,8 @@ class SimpleModel(pl.LightningModule):
 
     def compute_nrmse(self, y_pred, y_true):
         """
-        Compute the Normalized Root Mean Squared Error.
-        This can be used to objectively compare models when the variance of the distribution is varied
+        Compute the Normalized Root Mean Squared Error. This can be used to objectively
+        compare models when the variance of the distribution is varied.
 
         :param y_pred: The predicted y values
         :type y_pred: torch.Tensor
@@ -64,6 +64,7 @@ class SimpleModel(pl.LightningModule):
         :type y_true: torch.Tensor
         :return: The normalized root mean squared error
         :rtype: torch.Tensor
+
         """
         rmse = torch.sqrt(nn.functional.mse_loss(y_pred, y_true))
 
@@ -71,7 +72,7 @@ class SimpleModel(pl.LightningModule):
         y_range = y_true.max() - y_true.min()
         nrmse = rmse / y_range
         return nrmse
-        
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the model (i.e. how predictions are made for a given input)

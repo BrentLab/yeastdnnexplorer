@@ -1,20 +1,22 @@
-from collections.abc import Callable
-
-import torch
-import pandas as pd
 import os
+
+import pandas as pd
+import torch
 from pytorch_lightning import LightningDataModule
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset
 
 
 class RealDataLoader(LightningDataModule):
-    """A class to load in data from the CSV data for various
-       binding and perturbation experiments. After loading in
-       the data, the data loader will parse the data into the 
-       form expected by our models. It will also split the data
-       into training, testing, and validation sets for the model
-       to use."""
+    """
+    A class to load in data from the CSV data for various binding and perturbation
+    experiments.
+
+    After loading in the data, the data loader will parse the data into the form
+    expected by our models. It will also split the data into training, testing, and
+    validation sets for the model to use.
+
+    """
 
     def __init__(
         self,
@@ -37,8 +39,8 @@ class RealDataLoader(LightningDataModule):
         :param random_state: The random seed to use for splitting the data (keep this
             consistent to ensure reproduceability)
         :type random_state: int
-        :param data_dir_path: The path to the directory containing the CSV files for
-            the binding and perturbation data
+        :param data_dir_path: The path to the directory containing the CSV files for the
+            binding and perturbation data
         :type data_dir_path: str
         :raises TypeError: If batch_size is not an positive integer
         :raises TypeError: If val_size is not a float between 0 and 1 (inclusive)
@@ -47,8 +49,8 @@ class RealDataLoader(LightningDataModule):
         :raises ValueError: If val_size + test_size is greater than 1 (i.e. the splits
             are too large)
         :raises ValueError: if no data_dir is provided
-        :raises AssertinoError: if the dataset sizes do not match up after reading
-            in the data from the CSV files
+        :raises AssertinoError: if the dataset sizes do not match up after reading in
+            the data from the CSV files
 
         """
         if not isinstance(batch_size, int) or batch_size < 1:
@@ -78,22 +80,37 @@ class RealDataLoader(LightningDataModule):
         self.test_dataset: TensorDataset | None = None
 
     def prepare_data(self) -> None:
-        """This function reads in the binding data and perturbation data
-           from the CSV files that we have for these datasets. It throws
-           out any genes that are not present in both the binding and 
-           perturbation sets, and then structures the data in a way that
-           the model expects and can use"""
-        
-        brent_cc_path = os.path.join(self.data_dir_path, 'binding/brent_nf_cc')
-        brent_nf_csv_files = [f for f in os.listdir(brent_cc_path) if f.endswith('.csv')]
-        perturb_dataset_path = os.path.join(self.data_dir_path, 'perturbation/hu_reimann_tfko')
-        perturb_dataset_csv_files = [f for f in os.listdir(perturb_dataset_path) if f.endswith('.csv')]
+        """
+        This function reads in the binding data and perturbation data from the CSV files
+        that we have for these datasets.
 
-        # get a list of the genes in the binding data csvs 
-            # for brent_cc (and the 3 perturb response datasets) the genes are in the same order in each csv
-            # so it suffices to grab the target_locus_tag column from the first one
-        brent_cc_genes_ids = pd.read_csv(os.path.join(brent_cc_path, brent_nf_csv_files[0]))['target_locus_tag']
-        perturb_dataset_genes_ids = pd.read_csv(os.path.join(perturb_dataset_path, perturb_dataset_csv_files[0]))['target_locus_tag']
+        It throws out any genes that are not present in both the binding and
+        perturbation sets, and then structures the data in a way that the model expects
+        and can use
+
+        """
+
+        brent_cc_path = os.path.join(self.data_dir_path, "binding/brent_nf_cc")
+        brent_nf_csv_files = [
+            f for f in os.listdir(brent_cc_path) if f.endswith(".csv")
+        ]
+        perturb_dataset_path = os.path.join(
+            self.data_dir_path, "perturbation/hu_reimann_tfko"
+        )
+        perturb_dataset_csv_files = [
+            f for f in os.listdir(perturb_dataset_path) if f.endswith(".csv")
+        ]
+
+        # get a list of the genes in the binding data csvs
+        # for brent_cc (and the 3 perturb response datasets) the genes are
+        # in the same order in each csv, so it suffices to grab the target_locus_tag
+        # column from the first one
+        brent_cc_genes_ids = pd.read_csv(
+            os.path.join(brent_cc_path, brent_nf_csv_files[0])
+        )["target_locus_tag"]
+        perturb_dataset_genes_ids = pd.read_csv(
+            os.path.join(perturb_dataset_path, perturb_dataset_csv_files[0])
+        )["target_locus_tag"]
 
         # Get the intersection of the genes in the binding and perturbation data
         common_genes = set(brent_cc_genes_ids).intersection(perturb_dataset_genes_ids)
@@ -105,28 +122,32 @@ class RealDataLoader(LightningDataModule):
             file_path = os.path.join(brent_cc_path, file)
             df = pd.read_csv(file_path)
 
-            # only keep the genes that are in the intersection of the genes in the binding and perturbation data
-            df = df[df['target_locus_tag'].isin(common_genes)]
+            # only keep the genes that are in the intersection
+            # of the genes in the binding and perturbation data
+            df = df[df["target_locus_tag"].isin(common_genes)]
 
-            # we need to handle duplicates now (some datasets have multiple occurrences of the same gene)
+            # we need to handle duplicates now
+            # (some datasets have multiple occurrences of the same gene)
             # we will keep the occurrence with the highest value in the 'effect' column
-                # we can do this by sorting the dataframe by the 'effect' column in descending order
-                # and keeping the fist occurrence of each gene
-                # this does require us to do some additional work later (see how we are consistently
-                # setting the index to 'target_locus_tag', this ensures all of our datasets are in
-                # the same order)
-            df = df.sort_values('effect', ascending=False).drop_duplicates(subset='target_locus_tag', keep='first')
+            # we can do this by sorting the dataframe by the 'effect' column
+            # in descending order and keeping the fist occurrence of each gene
+            # this does require us to do some additional work later (see how we
+            # are consistently setting the index to 'target_locus_tag',
+            # this ensures all of our datasets are in the same order)
+            df = df.sort_values("effect", ascending=False).drop_duplicates(
+                subset="target_locus_tag", keep="first"
+            )
 
-            # on the first iteration, add the target_locus_tag column to the binding data
+            # on the first iteration, add target_locus_tag column to the binding data
             if i == 0:
-                binding_data_effects['target_locus_tag'] = df['target_locus_tag']
-                binding_data_pvalues['target_locus_tag'] = df['target_locus_tag']
-                binding_data_effects.set_index('target_locus_tag', inplace=True)
-                binding_data_pvalues.set_index('target_locus_tag', inplace=True)
+                binding_data_effects["target_locus_tag"] = df["target_locus_tag"]
+                binding_data_pvalues["target_locus_tag"] = df["target_locus_tag"]
+                binding_data_effects.set_index("target_locus_tag", inplace=True)
+                binding_data_pvalues.set_index("target_locus_tag", inplace=True)
 
-            binding_data_effects[file] = df.set_index('target_locus_tag')['effect']
-            binding_data_pvalues[file] = df.set_index('target_locus_tag')['pvalue']
-            
+            binding_data_effects[file] = df.set_index("target_locus_tag")["effect"]
+            binding_data_pvalues[file] = df.set_index("target_locus_tag")["pvalue"]
+
         # Read in perturbation data from csv files
         perturbation_effects = pd.DataFrame()
         perturbation_pvalues = pd.DataFrame()
@@ -134,45 +155,61 @@ class RealDataLoader(LightningDataModule):
             file_path = os.path.join(perturb_dataset_path, file)
             df = pd.read_csv(file_path)
 
-            # only keep the genes that are in the intersection of the genes in the binding and perturbation data
-            df = df[df['target_locus_tag'].isin(common_genes)]
+            # only keep the genes that are in the
+            # intersection of the genes in the binding and perturbation data
+            df = df[df["target_locus_tag"].isin(common_genes)]
 
             # handle duplicates
-            df = df.sort_values('effect', ascending=False).drop_duplicates(subset='target_locus_tag', keep='first')
+            df = df.sort_values("effect", ascending=False).drop_duplicates(
+                subset="target_locus_tag", keep="first"
+            )
 
-            # on the first iteration, add the target_locus_tag column to the perturbation data
+            # on the first iteration, add the target_locus_tag
+            # column to the perturbation data
             if i == 0:
-                perturbation_effects['target_locus_tag'] = df['target_locus_tag']
-                perturbation_pvalues['target_locus_tag'] = df['target_locus_tag']
-                perturbation_effects.set_index('target_locus_tag', inplace=True)
-                perturbation_pvalues.set_index('target_locus_tag', inplace=True)
+                perturbation_effects["target_locus_tag"] = df["target_locus_tag"]
+                perturbation_pvalues["target_locus_tag"] = df["target_locus_tag"]
+                perturbation_effects.set_index("target_locus_tag", inplace=True)
+                perturbation_pvalues.set_index("target_locus_tag", inplace=True)
 
-            perturbation_effects[file] = df.set_index('target_locus_tag')['effect']
-            perturbation_pvalues[file] = df.set_index('target_locus_tag')['pvalue']
-
+            perturbation_effects[file] = df.set_index("target_locus_tag")["effect"]
+            perturbation_pvalues[file] = df.set_index("target_locus_tag")["pvalue"]
 
         # shapes should be equal at this point
         assert binding_data_effects.shape == perturbation_effects.shape
         assert binding_data_pvalues.shape == perturbation_pvalues.shape
 
-        # reindex so that the rows in binding and perturb data match up (we need genes to be in the same order)
+        # reindex so that the rows in binding and perturb data match up
+        # (we need genes to be in the same order)
         perturbation_effects = perturbation_effects.reindex(binding_data_effects.index)
         perturbation_pvalues = perturbation_pvalues.reindex(binding_data_pvalues.index)
 
         # concat the data into the shape expected by the model
         # we need to first convert the data to tensors
-        binding_data_effects_tensor = torch.tensor(binding_data_effects.values, dtype=torch.float64)
-        binding_data_pvalues_tensor = torch.tensor(binding_data_pvalues.values, dtype=torch.float64)
-        perturbation_effects_tensor = torch.tensor(perturbation_effects.values, dtype=torch.float64)
-        perturbation_pvalues_tensor = torch.tensor(perturbation_pvalues.values, dtype=torch.float64)
+        binding_data_effects_tensor = torch.tensor(
+            binding_data_effects.values, dtype=torch.float64
+        )
+        binding_data_pvalues_tensor = torch.tensor(
+            binding_data_pvalues.values, dtype=torch.float64
+        )
+        perturbation_effects_tensor = torch.tensor(
+            perturbation_effects.values, dtype=torch.float64
+        )
+        perturbation_pvalues_tensor = torch.tensor(
+            perturbation_pvalues.values, dtype=torch.float64
+        )
 
-        # note that we no longer have a signal / noise tensor (like for the synthetic data)
-        self.final_data_tensor = torch.stack([
-            binding_data_effects_tensor,
-            binding_data_pvalues_tensor,
-            perturbation_effects_tensor,
-            perturbation_pvalues_tensor
-        ], dim=-1)
+        # note that we no longer have a signal / noise tensor
+        # (like for the synthetic data)
+        self.final_data_tensor = torch.stack(
+            [
+                binding_data_effects_tensor,
+                binding_data_pvalues_tensor,
+                perturbation_effects_tensor,
+                perturbation_pvalues_tensor,
+            ],
+            dim=-1,
+        )
 
     def setup(self, stage: str | None = None) -> None:
         """

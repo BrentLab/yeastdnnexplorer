@@ -4,7 +4,7 @@ from collections.abc import Callable
 
 import torch
 
-from yeastdnnexplorer.probability_models.relation_classes import Relation, And, Or
+from yeastdnnexplorer.probability_models.relation_classes import Relation
 
 logger = logging.getLogger(__name__)
 
@@ -289,6 +289,7 @@ def default_perturbation_effect_adjustment_function_old(
 
     return adjusted_mean
 
+
 def default_perturbation_effect_adjustment_function(
     binding_enrichment_data: torch.Tensor,
     signal_mean: float,
@@ -331,33 +332,38 @@ def default_perturbation_effect_adjustment_function(
     for gene_idx in range(signal_labels.shape[0]):
         for tf_index in range(signal_labels.shape[1]):
             if signal_labels[gene_idx, tf_index] == 1:
-                # draw a random value between 0 and 1 to use to control magnitude of adjustment
+                # draw a random value between 0 and 1 to use to control
+                # magnitude of adjustment
                 adjustment_multiplier = torch.rand(1)
 
                 # randomly adjust the gene by some portion of the max adjustment
-                adjusted_mean_matrix[gene_idx, tf_index] = signal_mean + (adjustment_multiplier * max_adjustment)
+                adjusted_mean_matrix[gene_idx, tf_index] = signal_mean + (
+                    adjustment_multiplier * max_adjustment
+                )
             else:
-                # related tfs are not all bound, so set the enrichment score to noise mean
+                # related tfs are not all bound, so set the enrichment
+                # score to noise mean
                 adjusted_mean_matrix[gene_idx, tf_index] = noise_mean
 
     return adjusted_mean_matrix
+
 
 def perturbation_effect_adjustment_function_with_tf_relationships_boolean_logic(
     binding_enrichment_data: torch.Tensor,
     signal_mean: float,
     noise_mean: float,
     max_adjustment: float,
-    tf_relationships: dict[int, list[Relation]] = None,
+    tf_relationships: dict[int, list[Relation]],
 ) -> torch.Tensor:
     """
     Adjust the mean of the perturbation effect based on the enrichment score and the
-    provided binary / boolean or unary relationships between TFs. For each gene, 
-    the mean of the TF-gene pair's perturbation effect will be adjusted if the TF is 
-    bound to the gene and all of the Relations associated with the TF are satisfied
-    (ie they evaluate to True). These relations could be unary conditions or 
-    Ands or Ors between TFs. A TF being bound corresponds to a true value, which means
-    And(4, 5) would be satisfied is both TF 4 and TF 5 are bound to the gene in question.
-    The adjustment will be a random value not exceeding the maximum adjustment.
+    provided binary / boolean or unary relationships between TFs. For each gene, the
+    mean of the TF-gene pair's perturbation effect will be adjusted if the TF is bound
+    to the gene and all of the Relations associated with the TF are satisfied (ie they
+    evaluate to True). These relations could be unary conditions or Ands or Ors between
+    TFs. A TF being bound corresponds to a true value, which means And(4, 5) would be
+    satisfied is both TF 4 and TF 5 are bound to the gene in question. The adjustment
+    will be a random value not exceeding the maximum adjustment.
 
     :param binding_enrichment_data: A tensor of enrichment scores for each gene with
         dimensions [n_genes, n_tfs, 3] where the entries in the third dimension are a
@@ -370,68 +376,92 @@ def perturbation_effect_adjustment_function_with_tf_relationships_boolean_logic(
     :param max_adjustment: The maximum adjustment to the base mean based on enrichment.
     :type max_adjustment: float
     :param tf_relationships: A dictionary where the keys are TF indices and the values
-        are lists of Relation objects that represent the conditions that must be met
-        for the mean of the perturbation effect associated with the TF-gene pair to
-        be adjusted.
+        are lists of Relation objects that represent the conditions that must be met for
+        the mean of the perturbation effect associated with the TF-gene pair to be
+        adjusted.
     :type tf_relationships: dict[int, list[Relation]]
     :return: Adjusted mean as a tensor.
     :rtype: torch.Tensor
-
-    :raises ValueError: If tf_relationships is not a dictionary between ints and lists of Relations
-    :raises ValueError: If the tf_relationships dict does not have the same number of TFs
-        as the binding_data tensor passed into the function
-    :raises ValueError: If the tf_relationships dict has any TFs in the values that are 
+    :raises ValueError: If tf_relationships is not a dictionary between ints and lists
+        of Relations
+    :raises ValueError: If the tf_relationships dict does not have the same number of
+        TFs as the binding_data tensor passed into the function
+    :raises ValueError: If the tf_relationships dict has any TFs in the values that are
         not also in the keys or any key or value TFs that are out of bounds for the
         binding_data tensor
-    """
-    if not isinstance(tf_relationships, dict) or not all(isinstance(v, list) for v in tf_relationships.values()) or not all(isinstance(k, int) for k in tf_relationships.keys()) or not all(isinstance(i, Relation) for v in tf_relationships.values() for i in v):
-        raise ValueError("tf_relationships must be a dictionary between ints and lists of Relation objects")
-    if not all(k in range(binding_enrichment_data.shape[1]) for k in tf_relationships.keys()):
-        raise ValueError("all TFs mentioned in tf_relationships must be within the bounds of the binding_data tensor's number of TFs")
-    if not len(tf_relationships) == binding_enrichment_data.shape[1]:
-        raise ValueError("tf_relationships must have the same number of TFs as the binding_data tensor passed into the function")
-    
-    # Extract signal/noise labels and enrichment scores
-    signal_labels = binding_enrichment_data[:, :, 0]   # shape: (num_genes, num_tfs)
-    enrichment_scores = binding_enrichment_data[:, :, 1]   # shape: (num_genes, num_tfs)
 
-    # we set all unbound scores to 0, then we will go through and also set any bound scores to noise_mean
-    # if the related boolean statements are not satisfied
+    """
+    if (
+        not isinstance(tf_relationships, dict)
+        or not all(isinstance(v, list) for v in tf_relationships.values())
+        or not all(isinstance(k, int) for k in tf_relationships.keys())
+        or not all(
+            isinstance(i, Relation) for v in tf_relationships.values() for i in v
+        )
+    ):
+        raise ValueError(
+            "tf_relationships must be a dictionary between \
+                ints and lists of Relation objects"
+        )
+    if not all(
+        k in range(binding_enrichment_data.shape[1]) for k in tf_relationships.keys()
+    ):
+        raise ValueError(
+            "all TFs mentioned in tf_relationships must be within \
+                the bounds of the binding_data tensor's number of TFs"
+        )
+    if not len(tf_relationships) == binding_enrichment_data.shape[1]:
+        raise ValueError(
+            "tf_relationships must have the same number of TFs as \
+                the binding_data tensor passed into the function"
+        )
+
+    # Extract signal/noise labels and enrichment scores
+    signal_labels = binding_enrichment_data[:, :, 0]  # shape: (num_genes, num_tfs)
+    enrichment_scores = binding_enrichment_data[:, :, 1]  # shape: (num_genes, num_tfs)
+
+    # we set all unbound scores to 0, then we will go through and also set any
+    # bound scores to noise_mean if the related boolean statements are not satisfied
     adjusted_mean_matrix = torch.where(
         signal_labels == 1, enrichment_scores, torch.zeros_like(enrichment_scores)
     )  # shape: (num_genes, num_tfs)
 
     for gene_idx in range(signal_labels.shape[0]):
         for tf_index, relations in tf_relationships.items():
-            # check if all relations (boolean relationships) associated with TFs are satisfied
+            # check if all relations (boolean relationships)
+            # associated with TFs are satisfied
             if signal_labels[gene_idx, tf_index] == 1 and all(
                 relation.evaluate(signal_labels[gene_idx].tolist())
                 for relation in relations
             ):
-                # draw a random value between 0 and 1 to use to control magnitude of adjustment
+                # draw a random value between 0 and 1 to use to
+                # control magnitude of adjustment
                 adjustment_multiplier = torch.rand(1)
 
                 # randomly adjust the gene by some portion of the max adjustment
-                adjusted_mean_matrix[gene_idx, tf_index] = signal_mean + (adjustment_multiplier * max_adjustment)
+                adjusted_mean_matrix[gene_idx, tf_index] = signal_mean + (
+                    adjustment_multiplier * max_adjustment
+                )
             else:
-                # related tfs are not all bound, so set the enrichment score to noise mean
+                # related tfs are not all bound, set the enrichment score to noise mean
                 adjusted_mean_matrix[gene_idx, tf_index] = noise_mean
 
-    return adjusted_mean_matrix # shape (num_genes, num_tfs)
+    return adjusted_mean_matrix  # shape (num_genes, num_tfs)
+
 
 def perturbation_effect_adjustment_function_with_tf_relationships(
     binding_enrichment_data: torch.Tensor,
     signal_mean: float,
     noise_mean: float,
     max_adjustment: float,
-    tf_relationships: dict[int, list[int]] = None,
+    tf_relationships: dict[int, list[int]],
 ) -> torch.Tensor:
     """
     Adjust the mean of the perturbation effect based on the enrichment score and the
     provided relationships between TFs. For each gene, the mean of the TF-gene pair's
-    perturbation effect will be adjusted if the TF is bound to the gene and all
-    related TFs are also bound to the gene. The adjustment will be a random value
-    not exceeding the maximum adjustment.
+    perturbation effect will be adjusted if the TF is bound to the gene and all related
+    TFs are also bound to the gene. The adjustment will be a random value not exceeding
+    the maximum adjustment.
 
     :param binding_enrichment_data: A tensor of enrichment scores for each gene with
         dimensions [n_genes, n_tfs, 3] where the entries in the third dimension are a
@@ -448,27 +478,47 @@ def perturbation_effect_adjustment_function_with_tf_relationships(
     :type tf_relationships: dict[int, list[int]]
     :return: Adjusted mean as a tensor.
     :rtype: torch.Tensor
-
-    :raises ValueError: If tf_relationships is not a dictionary between ints and lists of ints
-    :raises ValueError: If the tf_relationships dict does not have the same number of TFs
-        as the binding_data tensor passed into the function
-    :raises ValueError: If the tf_relationships dict has any TFs in the values that are 
+    :raises ValueError: If tf_relationships is not a dictionary between ints and lists
+        of ints
+    :raises ValueError: If the tf_relationships dict does not have the same number of
+        TFs as the binding_data tensor passed into the function
+    :raises ValueError: If the tf_relationships dict has any TFs in the values that are
         not also in the keys or any key or value TFs that are out of bounds for the
         binding_data tensor
-    """
-    if not isinstance(tf_relationships, dict) or not all(isinstance(v, list) for v in tf_relationships.values()) or not all(isinstance(k, int) for k in tf_relationships.keys()) or not all(isinstance(i, int) for v in tf_relationships.values() for i in v):
-        raise ValueError("tf_relationships must be a dictionary between ints and lists of ints")
-    if not all(k in range(binding_enrichment_data.shape[1]) for k in tf_relationships.keys()) or not all(i in range(binding_enrichment_data.shape[1]) for v in tf_relationships.values() for i in v):
-        raise ValueError("all keys and values in tf_relationships must be within the bounds of the binding_data tensor's number of TFs")
-    if not len(tf_relationships) == binding_enrichment_data.shape[1]:
-        raise ValueError("tf_relationships must have the same number of TFs as the binding_data tensor passed into the function")
-    
-    # Extract signal/noise labels and enrichment scores
-    signal_labels = binding_enrichment_data[:, :, 0]   # shape: (num_genes, num_tfs)
-    enrichment_scores = binding_enrichment_data[:, :, 1]   # shape: (num_genes, num_tfs)
 
-    # we set all unbound scores to 0, then we will go through and also set any bound scores to noise_mean
-    # if the related tfs are not also bound
+    """
+    if (
+        not isinstance(tf_relationships, dict)
+        or not all(isinstance(v, list) for v in tf_relationships.values())
+        or not all(isinstance(k, int) for k in tf_relationships.keys())
+        or not all(isinstance(i, int) for v in tf_relationships.values() for i in v)
+    ):
+        raise ValueError(
+            "tf_relationships must be a dictionary between ints and lists of ints"
+        )
+    if not all(
+        k in range(binding_enrichment_data.shape[1]) for k in tf_relationships.keys()
+    ) or not all(
+        i in range(binding_enrichment_data.shape[1])
+        for v in tf_relationships.values()
+        for i in v
+    ):
+        raise ValueError(
+            "all keys and values in tf_relationships must be within the \
+                  bounds of the binding_data tensor's number of TFs"
+        )
+    if not len(tf_relationships) == binding_enrichment_data.shape[1]:
+        raise ValueError(
+            "tf_relationships must have the same number of TFs as the \
+                binding_data tensor passed into the function"
+        )
+
+    # Extract signal/noise labels and enrichment scores
+    signal_labels = binding_enrichment_data[:, :, 0]  # shape: (num_genes, num_tfs)
+    enrichment_scores = binding_enrichment_data[:, :, 1]  # shape: (num_genes, num_tfs)
+
+    # we set all unbound scores to 0, then we will go through and also
+    # set any bound scores to noise_mean if the related tfs are not also bound
     adjusted_mean_matrix = torch.where(
         signal_labels == 1, enrichment_scores, torch.zeros_like(enrichment_scores)
     )  # shape: (num_genes, num_tfs)
@@ -478,16 +528,19 @@ def perturbation_effect_adjustment_function_with_tf_relationships(
             if signal_labels[gene_idx, tf_index] == 1 and torch.all(
                 signal_labels[gene_idx, related_tfs] == 1
             ):
-                # draw a random value between 0 and 1 to use to control magnitude of adjustment
+                # draw a random value between 0 and 1 to use to
+                # control magnitude of adjustment
                 adjustment_multiplier = torch.rand(1)
 
                 # randomly adjust the gene by some portion of the max adjustment
-                adjusted_mean_matrix[gene_idx, tf_index] = signal_mean + (adjustment_multiplier * max_adjustment)
+                adjusted_mean_matrix[gene_idx, tf_index] = signal_mean + (
+                    adjustment_multiplier * max_adjustment
+                )
             else:
-                # related tfs are not all bound, so set the enrichment score to noise mean
+                # related tfs are not all bound, set the enrichment score to noise mean
                 adjusted_mean_matrix[gene_idx, tf_index] = noise_mean
 
-    return adjusted_mean_matrix # shape (num_genes, num_tfs)
+    return adjusted_mean_matrix  # shape (num_genes, num_tfs)
 
 
 def generate_perturbation_effects(
@@ -499,7 +552,7 @@ def generate_perturbation_effects(
     signal_std: float = 1.0,
     max_mean_adjustment: float = 0.0,
     adjustment_function: Callable[
-        [torch.Tensor, float, float, float, dict[int, list[int]]], torch.Tensor
+        [torch.Tensor, float, float, float], torch.Tensor
     ] = default_perturbation_effect_adjustment_function,
     **kwargs,
 ) -> torch.Tensor:
@@ -585,8 +638,9 @@ def generate_perturbation_effects(
 
     # Apply adjustments to the base mean for the signal genes, if necessary
     if max_mean_adjustment > 0 and adjustment_function is not None:
-        # Assuming adjustment_function returns a vector of means for each gene. Signal genes that meet the criteria
-        # for adjustment will be affected by the status of the TFs. What TFs affect a given gene must be specified by
+        # Assuming adjustment_function returns a vector of means for each gene.
+        # Signal genes that meet the criteria for adjustment will be affected by
+        # the status of the TFs. What TFs affect a given gene must be specified by
         # the adjustment_function()
         adjusted_means = adjustment_function(
             binding_data,
@@ -598,7 +652,9 @@ def generate_perturbation_effects(
 
         # add adjustments, ensuring they respect the original sign
         if adjusted_means.ndim == 1:
-            effects = signs * torch.abs(torch.normal(mean=adjusted_means, std=signal_std))
+            effects = signs * torch.abs(
+                torch.normal(mean=adjusted_means, std=signal_std)
+            )
         else:
             effects = torch.zeros_like(adjusted_means)
             for col_idx in range(effects.size(1)):

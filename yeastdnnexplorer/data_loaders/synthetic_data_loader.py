@@ -5,13 +5,13 @@ from pytorch_lightning import LightningDataModule
 from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset
 
-from yeastdnnexplorer.probability_models.relation_classes import Relation, And, Or
 from yeastdnnexplorer.probability_models.generate_data import (
     generate_binding_effects,
     generate_gene_population,
     generate_perturbation_effects,
     generate_pvalues,
 )
+from yeastdnnexplorer.probability_models.relation_classes import Relation
 
 
 class SyntheticDataLoader(LightningDataModule):

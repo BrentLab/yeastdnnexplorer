@@ -4,7 +4,7 @@ import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 from torch.optim import Optimizer
-from torchmetrics import MeanSquaredError, MeanAbsoluteError, R2Score
+from torchmetrics import R2Score
 
 
 class CustomizableModel(pl.LightningModule):
@@ -29,7 +29,7 @@ class CustomizableModel(pl.LightningModule):
         lr: float = 0.001,
         hidden_layer_num: int = 1,
         hidden_layer_sizes: list = [128],
-        activation: str = "ReLU",  # can be "ReLU", "Sigmoid", "Tanh", "LeakyRelU"
+        activation: str = "ReLU",  # can be "ReLU", "Sigmoid", "Tanh", "LeakyReLU"
         optimizer: str = "Adam",  # can be "Adam", "SGD", "RMSprop"
         L2_regularization_term: float = 0.0,
         dropout_rate: float = 0.0,
@@ -144,11 +144,11 @@ class CustomizableModel(pl.LightningModule):
             x = self.dropout(self.activation(hidden_layer(x)))
         x = self.output_layer(x)
         return x
-    
+
     def compute_nrmse(self, y_pred, y_true):
         """
-        Compute the Normalized Root Mean Squared Error.
-        This can be used to objectively compare models when the variance of the distribution is varied
+        Compute the Normalized Root Mean Squared Error. This can be used to objectively
+        compare models when the variance of the distribution is varied.
 
         :param y_pred: The predicted y values
         :type y_pred: torch.Tensor
@@ -156,6 +156,7 @@ class CustomizableModel(pl.LightningModule):
         :type y_true: torch.Tensor
         :return: The normalized root mean squared error
         :rtype: torch.Tensor
+
         """
         rmse = torch.sqrt(nn.functional.mse_loss(y_pred, y_true))
 
