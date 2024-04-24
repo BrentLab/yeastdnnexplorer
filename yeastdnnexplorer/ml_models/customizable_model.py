@@ -4,7 +4,8 @@ import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 from torch.optim import Optimizer
-from torchmetrics import MeanAbsolutePercentageError, R2Score, MeanAbsoluteError
+from torchmetrics import MeanAbsoluteError
+
 from yeastdnnexplorer.ml_models.metrics import SMSE
 
 

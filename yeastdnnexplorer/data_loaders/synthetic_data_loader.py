@@ -6,11 +6,11 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader, TensorDataset
 
 from yeastdnnexplorer.probability_models.generate_data import (
+    default_perturbation_effect_adjustment_function,
     generate_binding_effects,
     generate_gene_population,
     generate_perturbation_effects,
     generate_pvalues,
-    default_perturbation_effect_adjustment_function
 )
 from yeastdnnexplorer.probability_models.relation_classes import Relation
 
@@ -35,7 +35,7 @@ class SyntheticDataLoader(LightningDataModule):
         random_state: int = 42,
         max_mean_adjustment: float = 0.0,
         adjustment_function: Callable[
-        [torch.Tensor, float, float, float], torch.Tensor
+            [torch.Tensor, float, float, float], torch.Tensor
         ] = default_perturbation_effect_adjustment_function,
         tf_relationships: dict[int, list[int] | list[Relation]] = {},
     ) -> None:
@@ -160,13 +160,14 @@ class SyntheticDataLoader(LightningDataModule):
         # [num_genes, num_TFs, 3]
         binding_data_tensor = torch.stack(binding_data_combined, dim=1)
 
-        # if we are using a mean adjustment, we need to generate perturbation effects in a 
-        # slightly different way than if we are not using a mean adjustment
+        # if we are using a mean adjustment, we need to generate perturbation
+        # effects in a slightly different way than if we are not using
+        # a mean adjustment
         if self.max_mean_adjustment > 0:
             perturbation_effects_list = generate_perturbation_effects(
                 binding_data_tensor,
                 signal_mean=self.signal_mean,
-                tf_index=0, # unused
+                tf_index=0,  # unused
                 max_mean_adjustment=self.max_mean_adjustment,
                 adjustment_function=self.adjustment_function,
                 tf_relationships=self.tf_relationships,
@@ -188,7 +189,7 @@ class SyntheticDataLoader(LightningDataModule):
                 generate_perturbation_effects(
                     binding_data_tensor[:, tf_index, :].unsqueeze(1),
                     signal_mean=self.signal_mean,
-                    tf_index=0, # unused
+                    tf_index=0,  # unused
                 )
                 for tf_index in range(sum(self.n_sample))
             ]
@@ -206,7 +207,6 @@ class SyntheticDataLoader(LightningDataModule):
             # Convert lists to tensors
             perturbation_effects_tensor = torch.stack(perturbation_effects_list, dim=1)
             perturbation_pvalues_tensor = torch.stack(perturbation_pvalue_list, dim=1)
-   
 
         # Ensure perturbation data is reshaped to match [n_genes, n_tfs]
         # This step might need adjustment based on the actual shapes of your tensors.

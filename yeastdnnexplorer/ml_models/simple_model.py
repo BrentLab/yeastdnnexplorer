@@ -4,8 +4,10 @@ import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 from torch.optim import Optimizer
-from torchmetrics import MeanAbsolutePercentageError, R2Score, MeanAbsoluteError
+from torchmetrics import MeanAbsoluteError
+
 from yeastdnnexplorer.ml_models.metrics import SMSE
+
 
 class SimpleModel(pl.LightningModule):
     """A class for a simple linear model that takes in binding effects for each
@@ -48,9 +50,7 @@ class SimpleModel(pl.LightningModule):
         self.lr = lr
         self.save_hyperparameters()
 
-        self.mape = MeanAbsolutePercentageError()
         self.mae = MeanAbsoluteError()
-        self.r2 = R2Score()
         self.SMSE = SMSE()
 
         # define layers for the model here
