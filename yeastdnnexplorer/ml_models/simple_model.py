@@ -4,8 +4,8 @@ import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 from torch.optim import Optimizer
-from torchmetrics import MeanAbsolutePercentageError, R2Score
-
+from torchmetrics import MeanAbsolutePercentageError, R2Score, MeanAbsoluteError
+from yeastdnnexplorer.ml_models.metrics import SMSE
 
 class SimpleModel(pl.LightningModule):
     """A class for a simple linear model that takes in binding effects for each
@@ -47,31 +47,14 @@ class SimpleModel(pl.LightningModule):
         self.output_dim = output_dim
         self.lr = lr
         self.save_hyperparameters()
+
         self.mape = MeanAbsolutePercentageError()
+        self.mae = MeanAbsoluteError()
         self.r2 = R2Score()
+        self.SMSE = SMSE()
 
         # define layers for the model here
         self.linear1 = nn.Linear(input_dim, output_dim)
-
-    def compute_nrmse(self, y_pred, y_true):
-        """
-        Compute the Normalized Root Mean Squared Error. This can be used to objectively
-        compare models when the variance of the distribution is varied.
-
-        :param y_pred: The predicted y values
-        :type y_pred: torch.Tensor
-        :param y_true: The true y values
-        :type y_true: torch.Tensor
-        :return: The normalized root mean squared error
-        :rtype: torch.Tensor
-
-        """
-        rmse = torch.sqrt(nn.functional.mse_loss(y_pred, y_true))
-
-        # normalize with the range of true y values
-        y_range = y_true.max() - y_true.min()
-        nrmse = rmse / y_range
-        return nrmse
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
@@ -84,10 +67,6 @@ class SimpleModel(pl.LightningModule):
         :rtype: torch.Tensor
 
         """
-        # x = self.activation(self.linear1(x))
-        # x = self.activation(self.linear2(x))
-        # return self.linear3(x)
-
         return self.linear1(x)
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
@@ -107,7 +86,8 @@ class SimpleModel(pl.LightningModule):
         y_pred = self(x)
         loss = nn.functional.mse_loss(y_pred, y)
         self.log("train_loss", loss)
-        self.log("train_mape", self.mape(y_pred, y))
+        self.log("train_mae", self.mae(y_pred, y))
+        self.log("train_smse", self.SMSE(y_pred, y))
         return loss
 
     def validation_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
@@ -128,9 +108,8 @@ class SimpleModel(pl.LightningModule):
         loss = nn.functional.mse_loss(y_pred, y)
 
         self.log("val_loss", loss)
-        self.log("val_mape", self.mape(y_pred, y))
-        self.log("val_r2", self.r2(y_pred.view(-1), y.view(-1)))
-        self.log("val_nrmse", self.compute_nrmse(y_pred, y))
+        self.log("val_mae", self.mae(y_pred, y))
+        self.log("val_smse", self.SMSE(y_pred, y))
         return loss
 
     def test_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
@@ -153,9 +132,8 @@ class SimpleModel(pl.LightningModule):
         y_pred = self(x)
         loss = nn.functional.mse_loss(y_pred, y)
         self.log("test_loss", loss)
-        self.log("test_nrmse", self.compute_nrmse(y_pred, y))
-        self.log("test_mape", self.mape(y_pred, y))
-        self.log("test_r2", self.r2(y_pred.view(-1), y.view(-1)))
+        self.log("test_mae", self.mae(y_pred, y))
+        self.log("test_smse", self.SMSE(y_pred, y))
         return loss
 
     def configure_optimizers(self) -> Optimizer:

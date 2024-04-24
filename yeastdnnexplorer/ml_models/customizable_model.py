@@ -4,7 +4,8 @@ import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 from torch.optim import Optimizer
-from torchmetrics import R2Score
+from torchmetrics import MeanAbsolutePercentageError, R2Score, MeanAbsoluteError
+from yeastdnnexplorer.ml_models.metrics import SMSE
 
 
 class CustomizableModel(pl.LightningModule):
@@ -101,7 +102,6 @@ class CustomizableModel(pl.LightningModule):
         self.hidden_layer_sizes = hidden_layer_sizes
         self.optimizer = optimizer
         self.L2_regularization_term = L2_regularization_term
-        self.r2 = R2Score()
         self.save_hyperparameters()
 
         match activation:
@@ -128,6 +128,9 @@ class CustomizableModel(pl.LightningModule):
 
         self.dropout = nn.Dropout(p=dropout_rate)
 
+        self.mae = MeanAbsoluteError()
+        self.SMSE = SMSE()
+
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         """
         Forward pass of the model (i.e. how predictions are made for a given input)
@@ -144,26 +147,6 @@ class CustomizableModel(pl.LightningModule):
             x = self.dropout(self.activation(hidden_layer(x)))
         x = self.output_layer(x)
         return x
-
-    def compute_nrmse(self, y_pred, y_true):
-        """
-        Compute the Normalized Root Mean Squared Error. This can be used to objectively
-        compare models when the variance of the distribution is varied.
-
-        :param y_pred: The predicted y values
-        :type y_pred: torch.Tensor
-        :param y_true: The true y values
-        :type y_true: torch.Tensor
-        :return: The normalized root mean squared error
-        :rtype: torch.Tensor
-
-        """
-        rmse = torch.sqrt(nn.functional.mse_loss(y_pred, y_true))
-
-        # normalize with the range of true y values
-        y_range = y_true.max() - y_true.min()
-        nrmse = rmse / y_range
-        return nrmse
 
     def training_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
         """
@@ -182,7 +165,8 @@ class CustomizableModel(pl.LightningModule):
         y_pred = self(x)
         mse_loss = nn.functional.mse_loss(y_pred, y)
         self.log("train_mse", mse_loss)
-        self.log("train_nrmse", self.compute_nrmse(y_pred, y))
+        self.log("train_mae", self.mae(y_pred, y))
+        self.log("train_smse", self.SMSE(y_pred, y))
         return mse_loss
 
     def validation_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
@@ -202,7 +186,8 @@ class CustomizableModel(pl.LightningModule):
         y_pred = self(x)
         mse_loss = nn.functional.mse_loss(y_pred, y)
         self.log("val_mse", mse_loss)
-        self.log("val_nrmse", self.compute_nrmse(y_pred, y))
+        self.log("val_mae", self.mae(y_pred, y))
+        self.log("val_smse", self.SMSE(y_pred, y))
         return mse_loss
 
     def test_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
@@ -225,7 +210,8 @@ class CustomizableModel(pl.LightningModule):
         y_pred = self(x)
         mse_loss = nn.functional.mse_loss(y_pred, y)
         self.log("test_mse", mse_loss)
-        self.log("test_nrmse", self.compute_nrmse(y_pred, y))
+        self.log("test_mae", self.mae(y_pred, y))
+        self.log("test_smse", self.SMSE(y_pred, y))
         return mse_loss
 
     def configure_optimizers(self) -> Optimizer:
