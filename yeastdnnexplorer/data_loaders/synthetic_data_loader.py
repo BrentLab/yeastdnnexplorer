@@ -14,6 +14,7 @@ from yeastdnnexplorer.probability_models.generate_data import (
 )
 from yeastdnnexplorer.probability_models.relation_classes import Relation
 
+
 class SyntheticDataLoader(LightningDataModule):
     """A class for a synthetic data loader that generates synthetic bindiing &
     perturbation effect data for training, validation, and testing a model This class
