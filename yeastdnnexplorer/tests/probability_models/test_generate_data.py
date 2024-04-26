@@ -64,7 +64,7 @@ def test_generate_pvalues_valid_input():
     assert torch.all(pvalues >= 0) and torch.all(pvalues <= 1)
 
     # Check if larger effects have p-values within the specified upper bound
-  large_effect_threshold = torch.quantile(torch.abs(effects), large_effect_percentile)
+    large_effect_threshold = torch.quantile(torch.abs(effects), large_effect_percentile)
     large_effect_mask = torch.abs(effects) >= large_effect_threshold
     assert torch.all(pvalues[large_effect_mask] <= large_effect_upper_pval)
 
