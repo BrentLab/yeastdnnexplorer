@@ -4,6 +4,9 @@ import pytorch_lightning as pl
 import torch
 import torch.nn as nn
 from torch.optim import Optimizer
+from torchmetrics import MeanAbsoluteError
+
+from yeastdnnexplorer.ml_models.metrics import SMSE
 
 
 class SimpleModel(pl.LightningModule):
@@ -47,6 +50,9 @@ class SimpleModel(pl.LightningModule):
         self.lr = lr
         self.save_hyperparameters()
 
+        self.mae = MeanAbsoluteError()
+        self.SMSE = SMSE()
+
         # define layers for the model here
         self.linear1 = nn.Linear(input_dim, output_dim)
 
@@ -80,6 +86,8 @@ class SimpleModel(pl.LightningModule):
         y_pred = self(x)
         loss = nn.functional.mse_loss(y_pred, y)
         self.log("train_loss", loss)
+        self.log("train_mae", self.mae(y_pred, y))
+        self.log("train_smse", self.SMSE(y_pred, y))
         return loss
 
     def validation_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
@@ -98,7 +106,10 @@ class SimpleModel(pl.LightningModule):
         x, y = batch
         y_pred = self(x)
         loss = nn.functional.mse_loss(y_pred, y)
+
         self.log("val_loss", loss)
+        self.log("val_mae", self.mae(y_pred, y))
+        self.log("val_smse", self.SMSE(y_pred, y))
         return loss
 
     def test_step(self, batch: Any, batch_idx: int) -> torch.Tensor:
@@ -121,6 +132,8 @@ class SimpleModel(pl.LightningModule):
         y_pred = self(x)
         loss = nn.functional.mse_loss(y_pred, y)
         self.log("test_loss", loss)
+        self.log("test_mae", self.mae(y_pred, y))
+        self.log("test_smse", self.SMSE(y_pred, y))
         return loss
 
     def configure_optimizers(self) -> Optimizer:
