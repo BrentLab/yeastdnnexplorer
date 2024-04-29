@@ -483,7 +483,7 @@ def perturbation_effect_adjustment_function_with_tf_relationships(
 
 def generate_perturbation_effects(
     binding_data: torch.Tensor,
-    tf_index: int,
+    tf_index: int = None,
     noise_mean: float = 0.0,
     noise_std: float = 1.0,
     signal_mean: float = 3.0,
@@ -508,7 +508,7 @@ def generate_perturbation_effects(
         where the entries in the third dimension are a matrix with columns
         [label, enrichment, pvalue].
     :type binding_data: torch.Tensor
-    :param tf_index: The index of the TF in the binding_data tensor.
+    :param tf_index: The index of the TF in the binding_data tensor. Not used if we pass in the entire binding_data tensor. Defaults to None
     :type tf_index: int
     :param noise_mean: The mean for noise genes. Defaults to 0.0
     :type noise_mean: float, optional
@@ -531,6 +531,12 @@ def generate_perturbation_effects(
         or max_mean_adjustment are not floats
 
     """
+    # check that a valid combination of inputs has been passed in
+    if (max_mean_adjustment == 0 and tf_index is None):
+        raise ValueError(
+            "If max_mean_adjustment is 0, then tf_index must be specified"
+        )
+
     if binding_data.ndim != 3 or binding_data.shape[2] != 3:
         raise ValueError(
             "enrichment_tensor must have dimensions [num_genes, num_TFs, "
@@ -559,8 +565,6 @@ def generate_perturbation_effects(
             "adjustment_function must have the signature "
             "(binding_enrichment_data, signal_mean, noise_mean, max_adjustment)"
         )
-
-    signal_mask = binding_data[:, tf_index, 0] == 1
 
     # Initialize an effects tensor for all genes
     effects = torch.empty(
@@ -600,6 +604,8 @@ def generate_perturbation_effects(
                     torch.normal(mean=adjusted_means[:, col_idx], std=signal_std)
                 )
     else:
+        signal_mask = binding_data[:, tf_index, 0] == 1
+
         # Generate effects based on the noise and signal means, applying the sign
         effects[~signal_mask] = signs[~signal_mask] * torch.abs(
             torch.normal(
