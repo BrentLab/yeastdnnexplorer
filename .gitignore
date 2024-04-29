@@ -1,3 +1,9 @@
+# Dataset directory
+data/
+
+# logs
+logs/
+
 # local tmp files
 tmp/*
 # But do not ignore README.md in the tmp directory
