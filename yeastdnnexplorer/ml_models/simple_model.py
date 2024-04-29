@@ -85,7 +85,7 @@ class SimpleModel(pl.LightningModule):
         x, y = batch
         y_pred = self(x)
         loss = nn.functional.mse_loss(y_pred, y)
-        self.log("train_loss", loss)
+        self.log("train_mse", loss)
         self.log("train_mae", self.mae(y_pred, y))
         self.log("train_smse", self.SMSE(y_pred, y))
         return loss
@@ -107,7 +107,7 @@ class SimpleModel(pl.LightningModule):
         y_pred = self(x)
         loss = nn.functional.mse_loss(y_pred, y)
 
-        self.log("val_loss", loss)
+        self.log("val_mse", loss)
         self.log("val_mae", self.mae(y_pred, y))
         self.log("val_smse", self.SMSE(y_pred, y))
         return loss
@@ -131,7 +131,7 @@ class SimpleModel(pl.LightningModule):
         x, y = batch
         y_pred = self(x)
         loss = nn.functional.mse_loss(y_pred, y)
-        self.log("test_loss", loss)
+        self.log("test_mse", loss)
         self.log("test_mae", self.mae(y_pred, y))
         self.log("test_smse", self.SMSE(y_pred, y))
         return loss
