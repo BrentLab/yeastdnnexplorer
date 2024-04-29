@@ -228,68 +228,6 @@ def generate_pvalues(
     return pvalues
 
 
-def default_perturbation_effect_adjustment_function_old(
-    binding_enrichment_data: torch.Tensor,
-    signal_mean: float,
-    noise_mean: float,
-    max_adjustment: float,
-    **kwargs,
-) -> torch.Tensor:
-    """
-    Default function to adjust the mean of the perturbation effect based on the
-    enrichment score.
-
-    All functions that are passed to generate_perturbation_effects() in the argument
-    adjustment_function must have the same signature as this function.
-
-    :param binding_enrichment_data: A tensor of enrichment scores for each gene with
-        dimensions [n_genes, n_tfs, 3] where the entries in the third dimension are a
-        matrix with columns [label, enrichment, pvalue].
-    :type binding_enrichment_data: torch.Tensor
-    :param signal_mean: The mean for signal genes.
-    :type signal_mean: float
-    :param noise_mean: The mean for noise genes.
-    :type noise_mean: float
-    :param max_adjustment: The maximum adjustment to the base mean based on enrichment.
-    :type max_adjustment: float
-    :param tf_relationships: Unused in this function. It is only here to match the
-        signature of the other adjustment functions.
-    :type tf_relationships: dict[int, list[int]], optional
-    :return: Adjusted mean as a tensor.
-    :rtype: torch.Tensor
-
-    """
-    # Extract signal/noise labels and enrichment scores
-    signal_labels = binding_enrichment_data[:, :, 0]
-    enrichment_scores = binding_enrichment_data[:, :, 1]
-
-    summed_enrichment_scores = torch.where(
-        signal_labels == 1, enrichment_scores, torch.zeros_like(enrichment_scores)
-    ).sum(dim=1)
-
-    # Normalize and transform summed enrichment scores
-    scaled_scores = (summed_enrichment_scores - summed_enrichment_scores.min()) / (
-        summed_enrichment_scores.max() - summed_enrichment_scores.min()
-    )
-
-    # Apply a moderate exponential transformation to increase small differences
-    transformed_scores = torch.sqrt(scaled_scores)
-
-    adjusted_scores = transformed_scores * max_adjustment
-
-    # Generate adjustment factors for signal genes, ensuring a value of 0 for
-    # noise genes Assuming the signal/noise label is consistent across TFs for
-    # each gene
-    adjusted_mean = signal_mean + torch.where(
-        signal_labels[:, 0] == 1, adjusted_scores, torch.zeros_like(adjusted_scores)
-    )
-
-    # NOTE: setting the noise genes to the noise mean
-    adjusted_mean[signal_labels[:, 0] == 0] = noise_mean
-
-    return adjusted_mean
-
-
 def default_perturbation_effect_adjustment_function(
     binding_enrichment_data: torch.Tensor,
     signal_mean: float,
@@ -545,7 +483,7 @@ def perturbation_effect_adjustment_function_with_tf_relationships(
 
 def generate_perturbation_effects(
     binding_data: torch.Tensor,
-    tf_index: int,
+    tf_index: int | None = None,
     noise_mean: float = 0.0,
     noise_std: float = 1.0,
     signal_mean: float = 3.0,
@@ -570,7 +508,9 @@ def generate_perturbation_effects(
         where the entries in the third dimension are a matrix with columns
         [label, enrichment, pvalue].
     :type binding_data: torch.Tensor
-    :param tf_index: The index of the TF in the binding_data tensor.
+    :param tf_index: The index of the TF in the binding_data tensor. Not used if we
+        are adjusting the means (ie only used if max_mean_adjustment == 0).
+        Defaults to None
     :type tf_index: int
     :param noise_mean: The mean for noise genes. Defaults to 0.0
     :type noise_mean: float, optional
@@ -593,6 +533,10 @@ def generate_perturbation_effects(
         or max_mean_adjustment are not floats
 
     """
+    # check that a valid combination of inputs has been passed in
+    if max_mean_adjustment == 0.0 and tf_index is None:
+        raise ValueError("If max_mean_adjustment is 0, then tf_index must be specified")
+
     if binding_data.ndim != 3 or binding_data.shape[2] != 3:
         raise ValueError(
             "enrichment_tensor must have dimensions [num_genes, num_TFs, "
@@ -621,8 +565,6 @@ def generate_perturbation_effects(
             "adjustment_function must have the signature "
             "(binding_enrichment_data, signal_mean, noise_mean, max_adjustment)"
         )
-
-    signal_mask = binding_data[:, tf_index, 0] == 1
 
     # Initialize an effects tensor for all genes
     effects = torch.empty(
@@ -662,6 +604,8 @@ def generate_perturbation_effects(
                     torch.normal(mean=adjusted_means[:, col_idx], std=signal_std)
                 )
     else:
+        signal_mask = binding_data[:, tf_index, 0] == 1
+
         # Generate effects based on the noise and signal means, applying the sign
         effects[~signal_mask] = signs[~signal_mask] * torch.abs(
             torch.normal(
