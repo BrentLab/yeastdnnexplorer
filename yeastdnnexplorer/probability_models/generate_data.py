@@ -483,7 +483,7 @@ def perturbation_effect_adjustment_function_with_tf_relationships(
 
 def generate_perturbation_effects(
     binding_data: torch.Tensor,
-    tf_index: int = None,
+    tf_index: int | None = None,
     noise_mean: float = 0.0,
     noise_std: float = 1.0,
     signal_mean: float = 3.0,
@@ -508,7 +508,9 @@ def generate_perturbation_effects(
         where the entries in the third dimension are a matrix with columns
         [label, enrichment, pvalue].
     :type binding_data: torch.Tensor
-    :param tf_index: The index of the TF in the binding_data tensor. Not used if we pass in the entire binding_data tensor. Defaults to None
+    :param tf_index: The index of the TF in the binding_data tensor. Not used if we
+        are adjusting the means (ie only used if max_mean_adjustment == 0).
+        Defaults to None
     :type tf_index: int
     :param noise_mean: The mean for noise genes. Defaults to 0.0
     :type noise_mean: float, optional
@@ -532,10 +534,8 @@ def generate_perturbation_effects(
 
     """
     # check that a valid combination of inputs has been passed in
-    if (max_mean_adjustment == 0 and tf_index is None):
-        raise ValueError(
-            "If max_mean_adjustment is 0, then tf_index must be specified"
-        )
+    if max_mean_adjustment == 0.0 and tf_index is None:
+        raise ValueError("If max_mean_adjustment is 0, then tf_index must be specified")
 
     if binding_data.ndim != 3 or binding_data.shape[2] != 3:
         raise ValueError(
