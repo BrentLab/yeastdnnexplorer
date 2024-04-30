@@ -5,6 +5,7 @@ description = "A development environment to explore implementations of deep neur
 authors = ["ben mueller <ben.j.mueller@wustl.edu>", "chase mateusiak <chasem@wustl.edu>", "michael brent <brent@wustl.edu>"]
 license = "GPL-3.0"
 readme = "README.md"
+exclude = ["experiments/"]
 
 [tool.poetry.dependencies]
 python = "^3.11"
@@ -55,7 +56,7 @@ pythonpath = ['.']
 
 [tool.coverage.run]
 include = ["yeastdnnexplorer/**"]
-omit = ["*/tests/*"]
+omit = ["*/tests/*", "experiments/"]
 
 [tool.black]
 line-length = 88
