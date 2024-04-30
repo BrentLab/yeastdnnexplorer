@@ -1,9 +1,7 @@
 site_name: yeastdnnexplorer
 site_description: "A collection of objects and functions to work with calling cards sequencing tools"
 site_author: "ben mueller <email@email.com>, chase mateusiak <chasem@wustl.edu>, michael brent <brent@wustl.edu>"
-# TODO: update this when moved to brentlab
 site_url: "https://brentlab.github.io/yeastdnnexplorer/"
-# TODO: update this when moved to brentlab
 repo_url: "https://github.com/brentlab/yeastdnnexplorer"
 repo_name: "yeastdnnexplorer"
 edit_uri: "edit/master/docs/"
@@ -26,35 +24,31 @@ plugins:
               docstring_style: 'sphinx'
 
 nav:
-- Home:
-    - index.md
+- Home: index.md
 - Tutorials:
-  - Generate in silico data: tutorials/generate_in_silico_data.ipynb
+  - Generate In-silico Data: tutorials/generate_in_silico_data.ipynb
+  - Hyperparameter Sweep: tutorials/hyperparameter_sweep.ipynb
+  - Lightning Crash Course: tutorials/lightning_crash_course.ipynb
+  - Testing Model Metrics: tutorials/testing_model_metrics.ipynb
+  - Visualizing and Testing Data Generation Methods: tutorials/visualizing_and_testing_data_generation_methods.ipynb
 - API:
-    - Probability Models:
-      - Generate Gene Population: probability_models/generate_gene_population.md
-      - probability_models/GenePopulation.md
-      - probability_models/generate_binding_effects.md
-      - probability_models/generate_pvalues.md
-      - probability_models/generate_perturbation_effects.md
-      - probability_models/default_perturbation_effect_adjustment_function.md
-- Experiments:
-- Models:
-  - SimpleModel:
-    - ml_models/SimpleModel_init.md
-    - ml_models/SimpleModel_forward.md
-    - ml_models/configure_optimizers.md
-    - ml_models/test_step.md
-    - ml_models/training_step.md
-    - ml_models/val_step.md
-- Data Loaders:
-  - SyntheticDataLoader:
-    - data_loaders/SyntheticDataLoader_init.md
-    - data_loaders/SyntheticDataLoader_prepare_data.md
-    - data_loaders/SyntheticDataLoader_setup.md
-    - data_loaders/test_dataloader.md
-    - data_loaders/train_dataloader.md
-    - data_loaders/val_dataloader.md
+  - Data Loaders:
+    - Synthetic Data Loader: data_loaders/synthetic_data_loader.md
+    - Real Data Loader: data_loaders/real_data_loader.md
+  - Models:
+    - ml_models/customizable_model.md
+    - ml_models/metrics_compute_nrmse.md
+    - ml_models/metrics_smse.md
+    - ml_models/simple_model.md
+  - Probability Models:
+    - probability_models/default_perturbation_effect_adjustment_function.md
+    - probability_models/GenePopulation.md
+    - probability_models/generate_binding_effects.md
+    - Generate Gene Population: probability_models/generate_gene_population.md
+    - probability_models/generate_perturbation_effects.md
+    - probability_models/generate_pvalues.md
+    - probability_models/perturbation_effect_adjustment_function_with_tf_relationships_boolean_logic.md
+    - probability_models/perturbation_effect_adjustment_function_with_tf_relationships.md
 
 markdown_extensions:
     - smarty
