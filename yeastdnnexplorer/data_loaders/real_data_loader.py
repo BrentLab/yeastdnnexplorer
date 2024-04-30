@@ -22,6 +22,7 @@ class RealDataLoader(LightningDataModule):
     we would like to write a dataModule that handles the other 2 binding datasets. For
     now, you can only pass in a parameter for the title of the perturb response
     dataset that you want to use, and brent_nf_cc is hardcoded as the binding dataset.
+
     """
 
     def __init__(
@@ -75,8 +76,17 @@ class RealDataLoader(LightningDataModule):
             raise ValueError("data_dir_path must be provided")
         if test_size + val_size > 1:
             raise ValueError("val_size + test_size must be less than or equal to 1")
-        if not isinstance(perturbation_dataset_title, str) and perturbation_dataset_title in ["hu_reimann_tfko", "kemmeren_tfko", "mcisaac_oe"]:
-            raise TypeError("perturbation_dataset_title must be a string and must be one of 'hu_reimann_tfko', 'kemmeren_tfko', or 'mcisaac_oe'")
+        if not isinstance(
+            perturbation_dataset_title, str
+        ) and perturbation_dataset_title in [
+            "hu_reimann_tfko",
+            "kemmeren_tfko",
+            "mcisaac_oe",
+        ]:
+            raise TypeError(
+                "perturbation_dataset_title must be a string and must be one"
+                " of 'hu_reimann_tfko', 'kemmeren_tfko', or 'mcisaac_oe'"
+            )
 
         super().__init__()
         self.batch_size = batch_size
