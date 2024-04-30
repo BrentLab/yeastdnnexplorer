@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "yeastdnnexplorer"
-version = "0.0.0dev"
+version = "0.0.1"
 description = "A development environment to explore implementations of deep neural networks for predicting the relationship between transcription factor and target genes using binding and perturbation data"
 authors = ["ben mueller <ben.j.mueller@wustl.edu>", "chase mateusiak <chasem@wustl.edu>", "michael brent <brent@wustl.edu>"]
 license = "GPL-3.0"
