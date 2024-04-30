@@ -22,7 +22,6 @@ jobs:
 
       - name: Set up Python
         uses: actions/setup-python@v5
-        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
       # Consider using pre-commit.ci for open source project
@@ -46,7 +45,6 @@ jobs:
     runs-on: ${{ matrix.os }}
     steps:
       - name: Set up Python
-        uses: actions/setup-python@v5
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
