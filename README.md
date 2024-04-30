@@ -91,7 +91,7 @@ The documentation is build with mkdocs:
 
 ##### Project layout
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+* mkdocs.yml    # The configuration file.
+* docs/
+   * index.md  # The documentation homepage.
+   * ...       # Other markdown pages, images and other files.
