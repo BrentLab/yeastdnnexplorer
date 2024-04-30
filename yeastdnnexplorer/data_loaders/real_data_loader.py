@@ -16,6 +16,13 @@ class RealDataLoader(LightningDataModule):
     expected by our models. It will also split the data into training, testing, and
     validation sets for the model to use.
 
+    NOTE: Right now the only binding dataset this works with is the brent_nf_cc dataset
+    because it has the same set of genes in each CSV file. This is the case for all of
+    the perturbation datasets, but not for the other 2 binding datasets. In the future
+    we would like to write a dataModule that handles the other 2 binding datasets. For
+    now, you can only pass in a parameter for the title of the perturb response
+    dataset that you want to use, and brent_nf_cc is hardcoded as the binding dataset.
+
     """
 
     def __init__(
@@ -25,6 +32,7 @@ class RealDataLoader(LightningDataModule):
         test_size: float = 0.1,
         random_state: int = 42,
         data_dir_path: str | None = None,
+        perturbation_dataset_title: str = "hu_reimann_tfko",
     ) -> None:
         """
         Constructor of RealDataLoader.
@@ -42,6 +50,9 @@ class RealDataLoader(LightningDataModule):
         :param data_dir_path: The path to the directory containing the CSV files for the
             binding and perturbation data
         :type data_dir_path: str
+        :param perturbation_dataset_title: The title of the perturbation dataset to use
+            (one of 'hu_reimann_tfko', 'kemmeren_tfko', or 'mcisaac_oe')
+        :type perturbation_dataset_title: str
         :raises TypeError: If batch_size is not an positive integer
         :raises TypeError: If val_size is not a float between 0 and 1 (inclusive)
         :raises TypeError: If test_size is not a float between 0 and 1 (inclusive)
@@ -65,6 +76,17 @@ class RealDataLoader(LightningDataModule):
             raise ValueError("data_dir_path must be provided")
         if test_size + val_size > 1:
             raise ValueError("val_size + test_size must be less than or equal to 1")
+        if not isinstance(
+            perturbation_dataset_title, str
+        ) and perturbation_dataset_title in [
+            "hu_reimann_tfko",
+            "kemmeren_tfko",
+            "mcisaac_oe",
+        ]:
+            raise TypeError(
+                "perturbation_dataset_title must be a string and must be one"
+                " of 'hu_reimann_tfko', 'kemmeren_tfko', or 'mcisaac_oe'"
+            )
 
         super().__init__()
         self.batch_size = batch_size
@@ -72,6 +94,7 @@ class RealDataLoader(LightningDataModule):
         self.test_size = test_size
         self.random_state = random_state
         self.data_dir_path = data_dir_path
+        self.perturbation_dataset_title = perturbation_dataset_title
 
         self.final_data_tensor: torch.Tensor = None
         self.binding_effect_matrix: torch.Tensor | None = None
@@ -95,7 +118,7 @@ class RealDataLoader(LightningDataModule):
             f for f in os.listdir(brent_cc_path) if f.endswith(".csv")
         ]
         perturb_dataset_path = os.path.join(
-            self.data_dir_path, "perturbation/hu_reimann_tfko"
+            self.data_dir_path, f"perturbation/{self.perturbation_dataset_title}"
         )
         perturb_dataset_csv_files = [
             f for f in os.listdir(perturb_dataset_path) if f.endswith(".csv")
