@@ -95,3 +95,5 @@ The documentation is build with mkdocs:
 * docs/
    * index.md  # The documentation homepage.
    * ...       # Other markdown pages, images and other files.
+
+To update the gh-pages documentation, use `poetry run mkdocs gh-deply`
