@@ -17,11 +17,9 @@ jobs:
         with:
           python-version: "3.x"
 
-      - name: Install dependencies
-        run: pip install mkdocs-autorefs
-
-      - name: Deploy docs
-        uses: mhausenblas/mkdocs-deploy-gh-pages@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          REQUIREMENTS: mkdocs_requirements.txt
+      - name: Install requirements
+        run: |
+          pip install -U pip
+          pip install poetry
+          poetry install
+          poetry run mkdocs gh-deploy
