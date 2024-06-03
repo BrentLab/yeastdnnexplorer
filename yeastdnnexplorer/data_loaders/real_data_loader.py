@@ -222,7 +222,7 @@ class RealDataLoader(LightningDataModule):
             perturbation_pvalues.values, dtype=torch.float64
         )
 
-        # note that we no longer have a signal / noise tensor
+        # note that we no longer have a bound / unbound tensor
         # (like for the synthetic data)
         self.final_data_tensor = torch.stack(
             [

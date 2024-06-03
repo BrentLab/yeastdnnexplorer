@@ -39,39 +39,39 @@ class GenePopulation:
 
 
 def generate_gene_population(
-    total: int = 1000, signal_group: float = 0.3
+    total: int = 1000, bound_group: float = 0.3
 ) -> GenePopulation:
     """
     Generate two sets of genes, one of which will be considered genes which show a
-    signal, and the other which does not. The return is a one dimensional boolean tensor
-    where a value of '0' means that the gene at that index is part of the noise group
-    and a '1' means the gene at that index is part of the signal group. The length of
-    the tensor is the number of genes in this simulated organism.
+    bound, and the other which does not. The return is a one dimensional boolean tensor
+    where a value of '0' means that the gene at that index is part of the unbound group
+    and a '1' means the gene at that index is part of the bound group. The length of the
+    tensor is the number of genes in this simulated organism.
 
     :param total: The total number of genes. defaults to 1000
     :type total: int, optional
-    :param signal_group: The proportion of genes in the signal group. defaults to 0.3
-    :type signal_group: float, optional
+    :param bound_group: The proportion of genes in the bound group. defaults to 0.3
+    :type bound_group: float, optional
     :return: A one dimensional tensor of boolean values where the set of indices with a
-        value of '1' are the signal group and the set of indices with a value of '0' are
-        the noise group.
+        value of '1' are the bound group and the set of indices with a value of '0' are
+        the unbound group.
     :rtype: GenePopulation
     :raises TypeError: if total is not an integer
-    :raises ValueError: If signal_group is not between 0 and 1
+    :raises ValueError: If bound_group is not between 0 and 1
 
     """
     if not isinstance(total, int):
         raise TypeError("total must be an integer")
-    if not 0 <= signal_group <= 1:
-        raise ValueError("signal_group must be between 0 and 1")
+    if not 0 <= bound_group <= 1:
+        raise ValueError("bound_group must be between 0 and 1")
 
-    signal_group_size = int(total * signal_group)
-    logger.info("Generating %s genes with signal", signal_group_size)
+    bound_group_size = int(total * bound_group)
+    logger.info("Generating %s genes with bound", bound_group_size)
 
     labels = torch.cat(
         (
-            torch.ones(signal_group_size, dtype=torch.bool),
-            torch.zeros(total - signal_group_size, dtype=torch.bool),
+            torch.ones(bound_group_size, dtype=torch.bool),
+            torch.zeros(total - bound_group_size, dtype=torch.bool),
         )
     )[torch.randperm(total)]
 
@@ -81,15 +81,15 @@ def generate_gene_population(
 def generate_binding_effects(
     gene_population: GenePopulation,
     background_hops_range: tuple[int, int] = (1, 100),
-    noise_experiment_hops_range: tuple[int, int] = (0, 1),
-    signal_experiment_hops_range: tuple[int, int] = (1, 6),
+    unbound_experiment_hops_range: tuple[int, int] = (0, 1),
+    bound_experiment_hops_range: tuple[int, int] = (1, 6),
     total_background_hops: int = 1000,
     total_experiment_hops: int = 76,
     pseudocount: float = 1e-10,
 ) -> torch.Tensor:
     """
     Generate enrichment effects for genes using vectorized operations, based on their
-    signal designation, with separate experiment hops ranges for noise and signal genes.
+    bound designation, with separate experiment hops ranges for unbound and bound genes.
 
     Note that the default values are a scaled down version of actual data. See also
     https://github.com/cmatKhan/callingCardsTools/blob/main/callingcardstools/PeakCalling/yeast/enrichment.py
@@ -99,12 +99,12 @@ def generate_binding_effects(
     :param background_hops_range: The range of hops for background genes. Defaults to
         (1, 100)
     :type background_hops_range: Tuple[int, int], optional
-    :param noise_experiment_hops_range: The range of hops for noise genes. Defaults to
-        (0, 1)
-    :type noise_experiment_hops_range: Tuple[int, int], optional
-    :param signal_experiment_hops_range: The range of hops for signal genes. Defaults to
+    :param unbound_experiment_hops_range: The range of hops for unbound genes. Defaults
+        to (0, 1)
+    :type unbound_experiment_hops_range: Tuple[int, int], optional
+    :param bound_experiment_hops_range: The range of hops for bound genes. Defaults to
         (1, 6)
-    :type signal_experiment_hops_range: Tuple[int, int], optional
+    :type bound_experiment_hops_range: Tuple[int, int], optional
     :param total_background_hops: The total number of background hops. Defaults to 1000
     :type total_background_hops: int, optional
     :param total_experiment_hops: The total number of experiment hops. Defaults to 76
@@ -118,11 +118,11 @@ def generate_binding_effects(
     :raises TypeError: If total_experiment_hops is not an integer
     :raises TypeError: If pseudocount is not a float
     :raises TypeError: If background_hops_range is not a tuple
-    :raises TypeError: If noise_experiment_hops_range is not a tuple
-    :raises TypeError: If signal_experiment_hops_range is not a tuple
+    :raises TypeError: If unbound_experiment_hops_range is not a tuple
+    :raises TypeError: If bound_experiment_hops_range is not a tuple
     :raises ValueError: If background_hops_range is not a tuple of length 2
-    :raises ValueError: If noise_experiment_hops_range is not a tuple of length 2
-    :raises ValueError: If signal_experiment_hops_range is not a tuple of length 2
+    :raises ValueError: If unbound_experiment_hops_range is not a tuple of length 2
+    :raises ValueError: If bound_experiment_hops_range is not a tuple of length 2
 
     """
     # NOTE: torch intervals are half open on the right, so we add 1 to the
@@ -139,8 +139,8 @@ def generate_binding_effects(
         raise TypeError("pseudocount must be a float")
     for arg, tup in {
         "background_hops_range": background_hops_range,
-        "noise_experiment_hops_range": noise_experiment_hops_range,
-        "signal_experiment_hops_range": signal_experiment_hops_range,
+        "unbound_experiment_hops_range": unbound_experiment_hops_range,
+        "bound_experiment_hops_range": bound_experiment_hops_range,
     }.items():
         if not isinstance(tup, tuple):
             raise TypeError(f"{arg} must be a tuple")
@@ -156,22 +156,22 @@ def generate_binding_effects(
         size=(gene_population.labels.shape[0],),
     )
 
-    # Generate experiment hops noise genes
-    noise_experiment_hops = torch.randint(
-        low=noise_experiment_hops_range[0],
-        high=noise_experiment_hops_range[1] + 1,
+    # Generate experiment hops unbound genes
+    unbound_experiment_hops = torch.randint(
+        low=unbound_experiment_hops_range[0],
+        high=unbound_experiment_hops_range[1] + 1,
         size=(gene_population.labels.shape[0],),
     )
-    # Generate experiment hops signal genes
-    signal_experiment_hops = torch.randint(
-        low=signal_experiment_hops_range[0],
-        high=signal_experiment_hops_range[1] + 1,
+    # Generate experiment hops bound genes
+    bound_experiment_hops = torch.randint(
+        low=bound_experiment_hops_range[0],
+        high=bound_experiment_hops_range[1] + 1,
         size=(gene_population.labels.shape[0],),
     )
 
-    # Use signal designation to select appropriate experiment hops
+    # Use bound designation to select appropriate experiment hops
     experiment_hops = torch.where(
-        gene_population.labels == 1, signal_experiment_hops, noise_experiment_hops
+        gene_population.labels == 1, bound_experiment_hops, unbound_experiment_hops
     )
 
     # Calculate enrichment for all genes
@@ -230,8 +230,8 @@ def generate_pvalues(
 
 def default_perturbation_effect_adjustment_function(
     binding_enrichment_data: torch.Tensor,
-    signal_mean: float,
-    noise_mean: float,
+    bound_mean: float,
+    unbound_mean: float,
     max_adjustment: float,
     **kwargs,
 ) -> torch.Tensor:
@@ -246,10 +246,10 @@ def default_perturbation_effect_adjustment_function(
         dimensions [n_genes, n_tfs, 3] where the entries in the third dimension are a
         matrix with columns [label, enrichment, pvalue].
     :type binding_enrichment_data: torch.Tensor
-    :param signal_mean: The mean for signal genes.
-    :type signal_mean: float
-    :param noise_mean: The mean for noise genes.
-    :type noise_mean: float
+    :param bound_mean: The mean for bound genes.
+    :type bound_mean: float
+    :param unbound_mean: The mean for unbound genes.
+    :type unbound_mean: float
     :param max_adjustment: The maximum adjustment to the base mean based on enrichment.
     :type max_adjustment: float
     :param tf_relationships: Unused in this function. It is only here to match the
@@ -259,37 +259,39 @@ def default_perturbation_effect_adjustment_function(
     :rtype: torch.Tensor
 
     """
-    # Extract signal/noise labels and enrichment scores
-    signal_labels = binding_enrichment_data[:, :, 0]
+    # Extract bound/unbound labels and enrichment scores
+    bound_labels = binding_enrichment_data[:, :, 0]
     enrichment_scores = binding_enrichment_data[:, :, 1]
 
     adjusted_mean_matrix = torch.where(
-        signal_labels == 1, enrichment_scores, torch.zeros_like(enrichment_scores)
+        bound_labels == 1, enrichment_scores, torch.zeros_like(enrichment_scores)
     )
 
-    for gene_idx in range(signal_labels.shape[0]):
-        for tf_index in range(signal_labels.shape[1]):
-            if signal_labels[gene_idx, tf_index] == 1:
-                # draw a random value between 0 and 1 to use to control
-                # magnitude of adjustment
-                adjustment_multiplier = torch.rand(1)
+    for gene_idx in range(bound_labels.shape[0]):
+        for tf_index in range(bound_labels.shape[1]):
+            if bound_labels[gene_idx, tf_index] == 1:
+                # divide its enrichment score by the maximum magnitude possible to
+                # create an adjustment multipler that scales with increasing enrichment
+                adjustment_multiplier = enrichment_scores[gene_idx, tf_index] / abs(
+                    enrichment_scores.max()
+                )
 
                 # randomly adjust the gene by some portion of the max adjustment
-                adjusted_mean_matrix[gene_idx, tf_index] = signal_mean + (
+                adjusted_mean_matrix[gene_idx, tf_index] = bound_mean + (
                     adjustment_multiplier * max_adjustment
                 )
             else:
                 # related tfs are not all bound, so set the enrichment
-                # score to noise mean
-                adjusted_mean_matrix[gene_idx, tf_index] = noise_mean
+                # score to unbound mean
+                adjusted_mean_matrix[gene_idx, tf_index] = unbound_mean
 
     return adjusted_mean_matrix
 
 
 def perturbation_effect_adjustment_function_with_tf_relationships_boolean_logic(
     binding_enrichment_data: torch.Tensor,
-    signal_mean: float,
-    noise_mean: float,
+    bound_mean: float,
+    unbound_mean: float,
     max_adjustment: float,
     tf_relationships: dict[int, list[Relation]],
 ) -> torch.Tensor:
@@ -307,10 +309,10 @@ def perturbation_effect_adjustment_function_with_tf_relationships_boolean_logic(
         dimensions [n_genes, n_tfs, 3] where the entries in the third dimension are a
         matrix with columns [label, enrichment, pvalue].
     :type binding_enrichment_data: torch.Tensor
-    :param signal_mean: The mean for signal genes.
-    :type signal_mean: float
-    :param noise_mean: The mean for noise genes.
-    :type noise_mean: float
+    :param bound_mean: The mean for bound genes.
+    :type bound_mean: float
+    :param unbound_mean: The mean for unbound genes.
+    :type unbound_mean: float
     :param max_adjustment: The maximum adjustment to the base mean based on enrichment.
     :type max_adjustment: float
     :param tf_relationships: A dictionary where the keys are TF indices and the values
@@ -354,22 +356,22 @@ def perturbation_effect_adjustment_function_with_tf_relationships_boolean_logic(
                 the binding_data tensor passed into the function"
         )
 
-    # Extract signal/noise labels and enrichment scores
-    signal_labels = binding_enrichment_data[:, :, 0]  # shape: (num_genes, num_tfs)
+    # Extract bound/unbound labels and enrichment scores
+    bound_labels = binding_enrichment_data[:, :, 0]  # shape: (num_genes, num_tfs)
     enrichment_scores = binding_enrichment_data[:, :, 1]  # shape: (num_genes, num_tfs)
 
     # we set all unbound scores to 0, then we will go through and also set any
-    # bound scores to noise_mean if the related boolean statements are not satisfied
+    # bound scores to unbound_mean if the related boolean statements are not satisfied
     adjusted_mean_matrix = torch.where(
-        signal_labels == 1, enrichment_scores, torch.zeros_like(enrichment_scores)
+        bound_labels == 1, enrichment_scores, torch.zeros_like(enrichment_scores)
     )  # shape: (num_genes, num_tfs)
 
-    for gene_idx in range(signal_labels.shape[0]):
+    for gene_idx in range(bound_labels.shape[0]):
         for tf_index, relations in tf_relationships.items():
             # check if all relations (boolean relationships)
             # associated with TFs are satisfied
-            if signal_labels[gene_idx, tf_index] == 1 and all(
-                relation.evaluate(signal_labels[gene_idx].tolist())
+            if bound_labels[gene_idx, tf_index] == 1 and all(
+                relation.evaluate(bound_labels[gene_idx].tolist())
                 for relation in relations
             ):
                 # draw a random value between 0 and 1 to use to
@@ -377,20 +379,21 @@ def perturbation_effect_adjustment_function_with_tf_relationships_boolean_logic(
                 adjustment_multiplier = torch.rand(1)
 
                 # randomly adjust the gene by some portion of the max adjustment
-                adjusted_mean_matrix[gene_idx, tf_index] = signal_mean + (
+                adjusted_mean_matrix[gene_idx, tf_index] = bound_mean + (
                     adjustment_multiplier * max_adjustment
                 )
             else:
-                # related tfs are not all bound, set the enrichment score to noise mean
-                adjusted_mean_matrix[gene_idx, tf_index] = noise_mean
+                # related tfs are not all bound, set the enrichment score to unbound
+                # mean
+                adjusted_mean_matrix[gene_idx, tf_index] = unbound_mean
 
     return adjusted_mean_matrix  # shape (num_genes, num_tfs)
 
 
 def perturbation_effect_adjustment_function_with_tf_relationships(
     binding_enrichment_data: torch.Tensor,
-    signal_mean: float,
-    noise_mean: float,
+    bound_mean: float,
+    unbound_mean: float,
     max_adjustment: float,
     tf_relationships: dict[int, list[int]],
 ) -> torch.Tensor:
@@ -405,10 +408,10 @@ def perturbation_effect_adjustment_function_with_tf_relationships(
         dimensions [n_genes, n_tfs, 3] where the entries in the third dimension are a
         matrix with columns [label, enrichment, pvalue].
     :type binding_enrichment_data: torch.Tensor
-    :param signal_mean: The mean for signal genes.
-    :type signal_mean: float
-    :param noise_mean: The mean for noise genes.
-    :type noise_mean: float
+    :param bound_mean: The mean for bound genes.
+    :type bound_mean: float
+    :param unbound_mean: The mean for unbound genes.
+    :type unbound_mean: float
     :param max_adjustment: The maximum adjustment to the base mean based on enrichment.
     :type max_adjustment: float
     :param tf_relationships: A dictionary where the keys are the indices of the TFs and
@@ -451,32 +454,33 @@ def perturbation_effect_adjustment_function_with_tf_relationships(
                 binding_data tensor passed into the function"
         )
 
-    # Extract signal/noise labels and enrichment scores
-    signal_labels = binding_enrichment_data[:, :, 0]  # shape: (num_genes, num_tfs)
+    # Extract bound/unbound labels and enrichment scores
+    bound_labels = binding_enrichment_data[:, :, 0]  # shape: (num_genes, num_tfs)
     enrichment_scores = binding_enrichment_data[:, :, 1]  # shape: (num_genes, num_tfs)
 
     # we set all unbound scores to 0, then we will go through and also
-    # set any bound scores to noise_mean if the related tfs are not also bound
+    # set any bound scores to unbound_mean if the related tfs are not also bound
     adjusted_mean_matrix = torch.where(
-        signal_labels == 1, enrichment_scores, torch.zeros_like(enrichment_scores)
+        bound_labels == 1, enrichment_scores, torch.zeros_like(enrichment_scores)
     )  # shape: (num_genes, num_tfs)
 
-    for gene_idx in range(signal_labels.shape[0]):
+    for gene_idx in range(bound_labels.shape[0]):
         for tf_index, related_tfs in tf_relationships.items():
-            if signal_labels[gene_idx, tf_index] == 1 and torch.all(
-                signal_labels[gene_idx, related_tfs] == 1
+            if bound_labels[gene_idx, tf_index] == 1 and torch.all(
+                bound_labels[gene_idx, related_tfs] == 1
             ):
                 # draw a random value between 0 and 1 to use to
                 # control magnitude of adjustment
                 adjustment_multiplier = torch.rand(1)
 
                 # randomly adjust the gene by some portion of the max adjustment
-                adjusted_mean_matrix[gene_idx, tf_index] = signal_mean + (
+                adjusted_mean_matrix[gene_idx, tf_index] = bound_mean + (
                     adjustment_multiplier * max_adjustment
                 )
             else:
-                # related tfs are not all bound, set the enrichment score to noise mean
-                adjusted_mean_matrix[gene_idx, tf_index] = noise_mean
+                # related tfs are not all bound, set the enrichment score to unbound
+                # mean
+                adjusted_mean_matrix[gene_idx, tf_index] = unbound_mean
 
     return adjusted_mean_matrix  # shape (num_genes, num_tfs)
 
@@ -484,10 +488,10 @@ def perturbation_effect_adjustment_function_with_tf_relationships(
 def generate_perturbation_effects(
     binding_data: torch.Tensor,
     tf_index: int | None = None,
-    noise_mean: float = 0.0,
-    noise_std: float = 1.0,
-    signal_mean: float = 3.0,
-    signal_std: float = 1.0,
+    unbound_mean: float = 0.0,
+    unbound_std: float = 1.0,
+    bound_mean: float = 3.0,
+    bound_std: float = 1.0,
     max_mean_adjustment: float = 0.0,
     adjustment_function: Callable[
         [torch.Tensor, float, float, float], torch.Tensor
@@ -512,14 +516,14 @@ def generate_perturbation_effects(
         are adjusting the means (ie only used if max_mean_adjustment == 0).
         Defaults to None
     :type tf_index: int
-    :param noise_mean: The mean for noise genes. Defaults to 0.0
-    :type noise_mean: float, optional
-    :param noise_std: The standard deviation for noise genes. Defaults to 1.0
-    :type noise_std: float, optional
-    :param signal_mean: The mean for signal genes. Defaults to 3.0
-    :type signal_mean: float, optional
-    :param signal_std: The standard deviation for signal genes. Defaults to 1.0
-    :type signal_std: float, optional
+    :param unbound_mean: The mean for unbound genes. Defaults to 0.0
+    :type unbound_mean: float, optional
+    :param unbound_std: The standard deviation for unbound genes. Defaults to 1.0
+    :type unbound_std: float, optional
+    :param bound_mean: The mean for bound genes. Defaults to 3.0
+    :type bound_mean: float, optional
+    :param bound_std: The standard deviation for bound genes. Defaults to 1.0
+    :type bound_std: float, optional
     :param max_mean_adjustment: The maximum adjustment to the base mean based
         on enrichment. Defaults to 0.0
     :type max_mean_adjustment: float, optional
@@ -529,7 +533,7 @@ def generate_perturbation_effects(
 
     :raises ValueError: If binding_data is not a 3D tensor with the third
         dimension having a length of 3
-    :raises ValueError: If noise_mean, noise_std, signal_mean, signal_std,
+    :raises ValueError: If unbound_mean, unbound_std, bound_mean, bound_std,
         or max_mean_adjustment are not floats
 
     """
@@ -545,10 +549,10 @@ def generate_perturbation_effects(
     # check the rest of the inputs
     if not all(
         isinstance(i, float)
-        for i in (noise_mean, noise_std, signal_mean, signal_std, max_mean_adjustment)
+        for i in (unbound_mean, unbound_std, bound_mean, bound_std, max_mean_adjustment)
     ):
         raise ValueError(
-            "noise_mean, noise_std, signal_mean, signal_std, "
+            "unbound_mean, unbound_std, bound_mean, bound_std, "
             "and max_mean_adjustment must be floats"
         )
     # check the Callable signature
@@ -556,14 +560,14 @@ def generate_perturbation_effects(
         i in inspect.signature(adjustment_function).parameters
         for i in (
             "binding_enrichment_data",
-            "signal_mean",
-            "noise_mean",
+            "bound_mean",
+            "unbound_mean",
             "max_adjustment",
         )
     ):
         raise ValueError(
             "adjustment_function must have the signature "
-            "(binding_enrichment_data, signal_mean, noise_mean, max_adjustment)"
+            "(binding_enrichment_data, bound_mean, unbound_mean, max_adjustment)"
         )
 
     # Initialize an effects tensor for all genes
@@ -578,16 +582,16 @@ def generate_perturbation_effects(
                           device=binding_data.device) * 2 - 1
     # fmt: on
 
-    # Apply adjustments to the base mean for the signal genes, if necessary
+    # Apply adjustments to the base mean for the bound genes, if necessary
     if max_mean_adjustment > 0 and adjustment_function is not None:
         # Assuming adjustment_function returns a vector of means for each gene.
-        # Signal genes that meet the criteria for adjustment will be affected by
+        # bound genes that meet the criteria for adjustment will be affected by
         # the status of the TFs. What TFs affect a given gene must be specified by
         # the adjustment_function()
         adjusted_means = adjustment_function(
             binding_data,
-            signal_mean,
-            noise_mean,
+            bound_mean,
+            unbound_mean,
             max_mean_adjustment,
             **kwargs,
         )
@@ -595,27 +599,25 @@ def generate_perturbation_effects(
         # add adjustments, ensuring they respect the original sign
         if adjusted_means.ndim == 1:
             effects = signs * torch.abs(
-                torch.normal(mean=adjusted_means, std=signal_std)
+                torch.normal(mean=adjusted_means, std=bound_std)
             )
         else:
             effects = torch.zeros_like(adjusted_means)
             for col_idx in range(effects.size(1)):
                 effects[:, col_idx] = signs * torch.abs(
-                    torch.normal(mean=adjusted_means[:, col_idx], std=signal_std)
+                    torch.normal(mean=adjusted_means[:, col_idx], std=bound_std)
                 )
     else:
-        signal_mask = binding_data[:, tf_index, 0] == 1
+        bound_mask = binding_data[:, tf_index, 0] == 1
 
-        # Generate effects based on the noise and signal means, applying the sign
-        effects[~signal_mask] = signs[~signal_mask] * torch.abs(
+        # Generate effects based on the unbound and bound means, applying the sign
+        effects[~bound_mask] = signs[~bound_mask] * torch.abs(
             torch.normal(
-                mean=noise_mean, std=noise_std, size=(torch.sum(~signal_mask),)
+                mean=unbound_mean, std=unbound_std, size=(torch.sum(~bound_mask),)
             )
         )
-        effects[signal_mask] = signs[signal_mask] * torch.abs(
-            torch.normal(
-                mean=signal_mean, std=signal_std, size=(torch.sum(signal_mask),)
-            )
+        effects[bound_mask] = signs[bound_mask] * torch.abs(
+            torch.normal(mean=bound_mean, std=bound_std, size=(torch.sum(bound_mask),))
         )
 
     return effects
