@@ -273,7 +273,7 @@ def default_perturbation_effect_adjustment_function(
                 # divide its enrichment score by the maximum magnitude possible to
                 # create an adjustment multipler that scales with increasing enrichment
                 adjustment_multiplier = enrichment_scores[gene_idx, tf_index] / abs(
-                    enrichment_scores.max() * 10
+                    enrichment_scores.max()
                 )
 
                 # randomly adjust the gene by some portion of the max adjustment
