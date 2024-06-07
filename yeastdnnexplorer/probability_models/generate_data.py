@@ -273,7 +273,7 @@ def default_perturbation_effect_adjustment_function(
                 # divide its enrichment score by the maximum magnitude possible to
                 # create an adjustment multipler that scales with increasing enrichment
                 adjustment_multiplier = enrichment_scores[gene_idx, tf_index] / abs(
-                    enrichment_scores.max()
+                    enrichment_scores.max() * 10
                 )
 
                 # randomly adjust the gene by some portion of the max adjustment
@@ -374,9 +374,12 @@ def perturbation_effect_adjustment_function_with_tf_relationships_boolean_logic(
                 relation.evaluate(bound_labels[gene_idx].tolist())
                 for relation in relations
             ):
-                # draw a random value between 0 and 1 to use to
-                # control magnitude of adjustment
-                adjustment_multiplier = torch.rand(1)
+                # OLD: adjustment_multiplier = torch.rand(1)
+                # divide its enrichment score by the maximum magnitude possible to
+                # create an adjustment multipler that scales with increasing enrichment
+                adjustment_multiplier = enrichment_scores[gene_idx, tf_index] / abs(
+                    enrichment_scores.max() * 10
+                )
 
                 # randomly adjust the gene by some portion of the max adjustment
                 adjusted_mean_matrix[gene_idx, tf_index] = bound_mean + (
@@ -469,9 +472,12 @@ def perturbation_effect_adjustment_function_with_tf_relationships(
             if bound_labels[gene_idx, tf_index] == 1 and torch.all(
                 bound_labels[gene_idx, related_tfs] == 1
             ):
-                # draw a random value between 0 and 1 to use to
-                # control magnitude of adjustment
-                adjustment_multiplier = torch.rand(1)
+                # OLD: adjustment_multiplier = torch.rand(1)
+                # divide its enrichment score by the maximum magnitude possible to
+                # create an adjustment multipler that scales with increasing enrichment
+                adjustment_multiplier = enrichment_scores[gene_idx, tf_index] / abs(
+                    enrichment_scores.max() * 10
+                )
 
                 # randomly adjust the gene by some portion of the max adjustment
                 adjusted_mean_matrix[gene_idx, tf_index] = bound_mean + (
