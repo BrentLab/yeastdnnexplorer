@@ -27,8 +27,8 @@ class SyntheticDataLoader(LightningDataModule):
         self,
         batch_size: int = 32,
         num_genes: int = 1000,
-        signal: list[float] = [0.1, 0.2, 0.2, 0.4, 0.5],
-        signal_mean: float = 3.0,
+        bound: list[float] = [0.1, 0.2, 0.2, 0.4, 0.5],
+        bound_mean: float = 3.0,
         n_sample: list[int] = [1, 2, 2, 4, 4],
         val_size: float = 0.1,
         test_size: float = 0.1,
@@ -47,10 +47,10 @@ class SyntheticDataLoader(LightningDataModule):
         :param num_genes: The number of genes in the synthetic data (this is the number
             of datapoints in our dataset)
         :type num_genes: int
-        :param signal: The proportion of genes in each sample group that are put in the
-            signal grop (i.e. have a non-zero binding effect and expression response)
-        :type signal: List[int]
-        :param n_sample: The number of samples to draw from each signal group
+        :param bound: The proportion of genes in each sample group that are put in the
+            bound grop (i.e. have a non-zero binding effect and expression response)
+        :type bound: List[int]
+        :param n_sample: The number of samples to draw from each bound group
         :type n_sample: List[int]
         :param val_size: The proportion of the dataset to include in the validation
             split
@@ -60,23 +60,23 @@ class SyntheticDataLoader(LightningDataModule):
         :param random_state: The random seed to use for splitting the data (keep this
             consistent to ensure reproduceability)
         :type random_state: int
-        :param signal_mean: The mean of the signal distribution
-        :type signal_mean: float
+        :param bound_mean: The mean of the bound distribution
+        :type bound_mean: float
         :param max_mean_adjustment: The maximum mean adjustment to apply to the mean
-                                    of the signal (bound) perturbation effects
+                                    of the bound (bound) perturbation effects
         :type max_mean_adjustment: float
-        :param adjustment_function: A function that adjusts the mean of the signal
+        :param adjustment_function: A function that adjusts the mean of the bound
                                     (bound) perturbation effects
         :type adjustment_function: Callable[[torch.Tensor, float, float,
                                    float, dict[int, list[int]]], torch.Tensor]
         :raises TypeError: If batch_size is not an positive integer
         :raises TypeError: If num_genes is not an positive integer
-        :raises TypeError: If signal is not a list of integers or floats
+        :raises TypeError: If bound is not a list of integers or floats
         :raises TypeError: If n_sample is not a list of integers
         :raises TypeError: If val_size is not a float between 0 and 1 (inclusive)
         :raises TypeError: If test_size is not a float between 0 and 1 (inclusive)
         :raises TypeError: If random_state is not an integer
-        :raises TypeError: If signal_mean is not a float
+        :raises TypeError: If bound_mean is not a float
         :raises ValueError: If val_size + test_size is greater than 1 (i.e. the splits
             are too large)
 
@@ -85,10 +85,10 @@ class SyntheticDataLoader(LightningDataModule):
             raise TypeError("batch_size must be a positive integer")
         if not isinstance(num_genes, int) or num_genes < 1:
             raise TypeError("num_genes must be a positive integer")
-        if not isinstance(signal, list) or not all(
-            isinstance(x, (int, float)) for x in signal
+        if not isinstance(bound, list) or not all(
+            isinstance(x, (int, float)) for x in bound
         ):
-            raise TypeError("signal must be a list of integers or floats")
+            raise TypeError("bound must be a list of integers or floats")
         if not isinstance(n_sample, list) or not all(
             isinstance(x, int) for x in n_sample
         ):
@@ -99,17 +99,17 @@ class SyntheticDataLoader(LightningDataModule):
             raise TypeError("test_size must be a float between 0 and 1 (inclusive)")
         if not isinstance(random_state, int):
             raise TypeError("random_state must be an integer")
-        if not isinstance(signal_mean, float):
-            raise TypeError("signal_mean must be a float")
+        if not isinstance(bound_mean, float):
+            raise TypeError("bound_mean must be a float")
         if test_size + val_size > 1:
             raise ValueError("val_size + test_size must be less than or equal to 1")
 
         super().__init__()
         self.batch_size = batch_size
         self.num_genes = num_genes
-        self.signal_mean = signal_mean
-        self.signal = signal or [0.1, 0.15, 0.2, 0.25, 0.3]
-        self.n_sample = n_sample or [1 for _ in range(len(self.signal))]
+        self.bound_mean = bound_mean
+        self.bound = bound or [0.1, 0.15, 0.2, 0.25, 0.3]
+        self.n_sample = n_sample or [1 for _ in range(len(self.bound))]
         self.num_tfs = sum(self.n_sample)  # sum of all n_sample is the number of TFs
         self.val_size = val_size
         self.test_size = test_size
@@ -132,10 +132,10 @@ class SyntheticDataLoader(LightningDataModule):
         performed as that is handled in the functions in generate_data.py."""
         # this will be a list of length 10 with a GenePopulation object in each element
         gene_populations_list = []
-        for signal_proportion, n_draws in zip(self.signal, self.n_sample):
+        for bound_proportion, n_draws in zip(self.bound, self.n_sample):
             for _ in range(n_draws):
                 gene_populations_list.append(
-                    generate_gene_population(self.num_genes, signal_proportion)
+                    generate_gene_population(self.num_genes, bound_proportion)
                 )
 
         # Generate binding data for each gene population
@@ -166,7 +166,7 @@ class SyntheticDataLoader(LightningDataModule):
         if self.max_mean_adjustment > 0:
             perturbation_effects_list = generate_perturbation_effects(
                 binding_data_tensor,
-                signal_mean=self.signal_mean,
+                bound_mean=self.bound_mean,
                 tf_index=0,  # unused
                 max_mean_adjustment=self.max_mean_adjustment,
                 adjustment_function=self.adjustment_function,
@@ -188,7 +188,7 @@ class SyntheticDataLoader(LightningDataModule):
             perturbation_effects_list = [
                 generate_perturbation_effects(
                     binding_data_tensor[:, tf_index, :].unsqueeze(1),
-                    signal_mean=self.signal_mean,
+                    bound_mean=self.bound_mean,
                     tf_index=0,  # unused
                 )
                 for tf_index in range(sum(self.n_sample))
