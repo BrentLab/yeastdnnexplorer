@@ -6,7 +6,8 @@
         "ndim",
         "pval",
         "pvalues",
-        "randperm"
+        "randperm",
+        "yeastdnnexplorer"
     ],
     "[markdown]": {
         "editor.formatOnSave": false
