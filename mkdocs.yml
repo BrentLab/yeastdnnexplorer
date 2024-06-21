@@ -27,6 +27,7 @@ nav:
 - Home: index.md
 - Tutorials:
   - Generate In-silico Data: tutorials/generate_in_silico_data.ipynb
+  - Database Interface: tutorials/database_interface.ipynb 
   - Hyperparameter Sweep: tutorials/hyperparameter_sweep.ipynb
   - Lightning Crash Course: tutorials/lightning_crash_course.ipynb
   - Testing Model Metrics: tutorials/testing_model_metrics.ipynb
@@ -49,6 +50,26 @@ nav:
     - probability_models/generate_pvalues.md
     - probability_models/perturbation_effect_adjustment_function_with_tf_relationships_boolean_logic.md
     - probability_models/perturbation_effect_adjustment_function_with_tf_relationships.md
+  - Database Interface:
+    - Records Only Classes:
+      - interface/BindingManualQCAPI.md
+      - interface/DataSourceAPI.md
+      - interface/ExpressionManualQCAPI.md
+      - interface/FileFormatAPI.md
+      - interface/GenomicFeatureAPI.md
+      - interface/RegulatorAPI.md
+    - Records and Files Classes:
+      - interface/BindingAPI.md
+      - interface/CallingCardsBackgroundAPI.md
+      - interface/ExpressionAPI.md
+      - interface/PromoterSetAPI.md
+      - interface/PromoterSetSigAPI.md
+    - Developer Classes:
+      - interface/AbstractAPI.md
+      - interface/AbstractRecordsAndFilesAPI.md
+      - interface/AbstractRecordsOnlyAPI.md
+      - interface/Cache.md
+      - interface/ParamsDict.md
 
 markdown_extensions:
     - smarty
