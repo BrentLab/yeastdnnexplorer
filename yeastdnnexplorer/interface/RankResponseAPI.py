@@ -4,7 +4,8 @@ import logging
 import os
 import tarfile
 import tempfile
-from typing import Any, Callable, Dict, Tuple
+from collections.abc import Callable
+from typing import Any
 
 import aiohttp
 import pandas as pd
@@ -19,15 +20,17 @@ class RankResponseAPI(AbstractRecordsAndFilesAPI):
     A class to interact with the Rank Response API.
 
     Retrieves rank response data from the database.
+
     """
 
     def __init__(self, **kwargs) -> None:
         """
-        Initialize the RankResponseAPI object. This will serve as an interface
-        to the RankResponse endpoint of both the database and the application cache.
+        Initialize the RankResponseAPI object. This will serve as an interface to the
+        RankResponse endpoint of both the database and the application cache.
 
         :param url: The URL of the Rank Response API
         :param kwargs: Additional parameters to pass to AbstractAPI.
+
         """
         super().__init__(
             url=kwargs.pop("url", os.getenv("PROMOTERSETSIG_URL", "")),
@@ -41,7 +44,7 @@ class RankResponseAPI(AbstractRecordsAndFilesAPI):
     async def read(
         self,
         callback: Callable[
-            [pd.DataFrame, Dict[str, Any] | None, Any], Any
+            [pd.DataFrame, dict[str, Any] | None, Any], Any
         ] = lambda metadata, data, cache, **kwargs: (
             {"metadata": metadata, "data": data}
         ),
@@ -51,10 +54,11 @@ class RankResponseAPI(AbstractRecordsAndFilesAPI):
         """
         Retrieve data from the Rank Response API.
 
-        :param callback: The function to call with the metadata from the
-            Rank Response API.
+        :param callback: The function to call with the metadata from the Rank Response
+            API.
         :param kwargs: Additional parameters to pass to the callback function.
         :return: The result of the callback function.
+
         """
         if not callable(callback) or {"metadata", "data", "cache"} - set(
             callback.__code__.co_varnames
@@ -127,13 +131,14 @@ class RankResponseAPI(AbstractRecordsAndFilesAPI):
 
     def _extract_files(
         self, tar_path: str
-    ) -> Tuple[pd.DataFrame, Dict[str, pd.DataFrame]]:
+    ) -> tuple[pd.DataFrame, dict[str, pd.DataFrame]]:
         """
         Extract metadata and associated files from a tarball.
 
         :param tar_path: The path to the tarball file.
-        :return: A tuple of metadata DataFrame and a dictionary of DataFrames for
-            each file.
+        :return: A tuple of metadata DataFrame and a dictionary of DataFrames for each
+            file.
+
         """
         with tarfile.open(tar_path, mode="r:gz") as tar:
             tar_members = tar.getmembers()
