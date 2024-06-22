@@ -1,13 +1,12 @@
 import logging
-from typing import Any, List
+from typing import Any
 
-from cachetools import TTLCache
+from cachetools import TTLCache  # type: ignore
 
 
 class Cache:
-    """
-    A caching class that uses cachetools for TTL caching with an LRU eviction policy.
-    """
+    """A caching class that uses cachetools for TTL caching with an LRU eviction
+    policy."""
 
     def __init__(self, maxsize: int = 100, ttl: int = 300):
         self.ttl_cache = TTLCache(maxsize=maxsize, ttl=ttl)
@@ -21,7 +20,7 @@ class Cache:
         """Set a value in the cache."""
         self.ttl_cache[key] = value
 
-    def list(self) -> List[str]:
+    def list(self) -> list[str]:
         """List all keys in the cache."""
         return list(self.ttl_cache.keys())
 

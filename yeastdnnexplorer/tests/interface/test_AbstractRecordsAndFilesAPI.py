@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 import pandas as pd
 import pytest
@@ -92,13 +92,13 @@ def promotersetsig_csv_string() -> str:
 class ConcreteRecordsAndFilesAPI(AbstractRecordsAndFilesAPI):
     """Concrete implementation of AbstractRecordsAndFilesAPI for testing purposes."""
 
-    def create(self, data: Dict[str, Any]) -> None:
+    def create(self, data: dict[str, Any], **kwargs) -> Any:
         pass
 
-    def update(self, id: str, data: Dict[str, Any]) -> None:
+    def update(self, **kwargs) -> Any:
         pass
 
-    def delete(self, id: str) -> None:
+    def delete(self, id: str, **kwargs) -> Any:
         pass
 
 
@@ -112,7 +112,6 @@ def api_client():
 
 @pytest.mark.asyncio
 async def test_read_without_files(snapshot, api_client):
-
     with aioresponses() as m:
         # Mock the HTTP response with the saved snapshot response
         m.get(
@@ -205,4 +204,5 @@ async def test_read_without_files(snapshot, api_client):
 #             assert result.get("metadata").shape == (5, 10)
 #             assert isinstance(result.get("data"), dict)
 #             assert len(result.get("data")) == 5
-#             assert all(isinstance(v, pd.DataFrame) for v in result.get("data").values())
+#             assert all(isinstance(v, pd.DataFrame) \
+#                     for v in result.get("data").values())

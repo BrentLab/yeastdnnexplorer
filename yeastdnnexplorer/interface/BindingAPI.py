@@ -6,16 +6,15 @@ from yeastdnnexplorer.interface.AbstractRecordsAndFilesAPI import (
 
 
 class BindingAPI(AbstractRecordsAndFilesAPI):
-    """
-    Class to interact with the BindingAPI endpoint.
-    """
+    """Class to interact with the BindingAPI endpoint."""
 
     def __init__(self, **kwargs) -> None:
         """
         Initialize the BindingAPI object.
 
-        :param kwargs: parameters to pass through AbstractRecordsAndFilesAPI
-            to AbstractAPI.
+        :param kwargs: parameters to pass through AbstractRecordsAndFilesAPI to
+            AbstractAPI.
+
         """
         valid_param_keys = kwargs.pop(
             "valid_param_keys",

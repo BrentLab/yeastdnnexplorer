@@ -4,15 +4,14 @@ from yeastdnnexplorer.interface.AbstractRecordsOnlyAPI import AbstractRecordsOnl
 
 
 class DataSourceAPI(AbstractRecordsOnlyAPI):
-    """
-    A class to interact with the DataSourceAPI endpoint.
-    """
+    """A class to interact with the DataSourceAPI endpoint."""
 
     def __init__(self, **kwargs):
         """
         Initialize the DataSourceAPI object.
 
         :param kwargs: parameters to pass to AbstractAPI via AbstractRecordsOnlyAPI.
+
         """
         valid_param_keys = kwargs.pop(
             "valid_param_keys",

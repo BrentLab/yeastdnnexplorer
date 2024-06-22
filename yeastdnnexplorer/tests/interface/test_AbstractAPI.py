@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any
 
 import pytest
 import responses
@@ -10,23 +10,22 @@ from yeastdnnexplorer.interface.ParamsDict import ParamsDict
 class ConcreteAPI(AbstractAPI):
     """Concrete implementation of AbstractAPI for testing purposes."""
 
-    def create(self, data: Dict[str, Any]) -> None:
+    def create(self, data: dict[str, Any], **kwargs) -> Any:
         pass  # Implement for testing if necessary
 
-    def read(self, id: str) -> Dict[str, Any]:
+    def read(self, **kwargs) -> dict[str, Any]:
         return {"id": id}  # Mock implementation for testing
 
-    def update(self, id: str, data: Dict[str, Any]) -> None:
+    def update(self, **kwargs) -> Any:
         pass  # Implement for testing if necessary
 
-    def delete(self, id: str) -> None:
+    def delete(self, id: str, **kwargs) -> Any:
         pass  # Implement for testing if necessary
 
 
 @pytest.fixture
 @responses.activate
 def api_client():
-
     valid_url = "https://valid.url"
     responses.add(responses.HEAD, valid_url, status=200)
     return ConcreteAPI(url=valid_url, token="token")

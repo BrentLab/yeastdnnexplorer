@@ -8,6 +8,7 @@ from .FileFormatAPI import FileFormatAPI
 from .GenomicFeatureAPI import GenomicFeatureAPI
 from .PromoterSetAPI import PromoterSetAPI
 from .PromoterSetSigAPI import PromoterSetSigAPI
+from .RankResponseAPI import RankResponseAPI
 from .RegulatorAPI import RegulatorAPI
 
 __all__ = [
@@ -21,5 +22,6 @@ __all__ = [
     "GenomicFeatureAPI",
     "PromoterSetAPI",
     "PromoterSetSigAPI",
+    "RankResponseAPI",
     "RegulatorAPI",
 ]

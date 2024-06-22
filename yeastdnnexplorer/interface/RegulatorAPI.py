@@ -4,15 +4,14 @@ from yeastdnnexplorer.interface.AbstractRecordsOnlyAPI import AbstractRecordsOnl
 
 
 class RegulatorAPI(AbstractRecordsOnlyAPI):
-    """
-    A class to interact with the RegulatorAPI endpoint.
-    """
+    """A class to interact with the RegulatorAPI endpoint."""
 
     def __init__(self, **kwargs):
         """
         Initialize the RegulatorAPI object.
 
         :param kwargs: parameters to pass to AbstractAPI via AbstractRecordsOnlyAPI.
+
         """
         valid_param_keys = kwargs.pop(
             "valid_param_keys",

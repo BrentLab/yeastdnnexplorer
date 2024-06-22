@@ -4,15 +4,14 @@ from yeastdnnexplorer.interface.AbstractRecordsOnlyAPI import AbstractRecordsOnl
 
 
 class GenomicFeatureAPI(AbstractRecordsOnlyAPI):
-    """
-    A class to interact with the GenomicFeatureAPI endpoint.
-    """
+    """A class to interact with the GenomicFeatureAPI endpoint."""
 
     def __init__(self, **kwargs):
         """
         Initialize the GenomicFeatureAPI object.
 
         :param kwargs: parameters to pass to AbstractAPI via AbstractRecordsOnlyAPI.
+
         """
         valid_param_keys = kwargs.pop(
             "valid_param_keys",

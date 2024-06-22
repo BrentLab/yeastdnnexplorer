@@ -1,6 +1,7 @@
 import logging
+from collections.abc import Callable
 from io import StringIO
-from typing import Any, Callable, Dict, Optional
+from typing import Any
 
 import aiohttp
 import pandas as pd
@@ -9,15 +10,15 @@ from yeastdnnexplorer.interface.AbstractAPI import AbstractAPI
 
 
 class AbstractRecordsOnlyAPI(AbstractAPI):
-    """
-    Abstract class for CRUD operations on records-only (no file storage) endpoints.
-    """
+    """Abstract class for CRUD operations on records-only (no file storage)
+    endpoints."""
 
     def __init__(self, **kwargs):
         """
         Initialize the RecordsOnlyAPI object.
 
         :param kwargs: Additional parameters to pass to AbstractAPI.
+
         """
         self.logger = logging.getLogger(__name__)
         super().__init__(**kwargs)
@@ -25,7 +26,7 @@ class AbstractRecordsOnlyAPI(AbstractAPI):
     async def read(
         self,
         callback: Callable[
-            [pd.DataFrame, Optional[Dict[str, Any]], Any], Any
+            [pd.DataFrame, dict[str, Any] | None, Any], Any
         ] = lambda metadata, data, cache, **kwargs: {
             "metadata": metadata,
             "data": data,
@@ -34,8 +35,8 @@ class AbstractRecordsOnlyAPI(AbstractAPI):
         **kwargs,
     ) -> Any:
         """
-        Retrieve data from the endpoint. The data will be returned as a dataframe.
-        The callback function must take metadata, data, and cache as parameters.
+        Retrieve data from the endpoint. The data will be returned as a dataframe. The
+        callback function must take metadata, data, and cache as parameters.
 
         :param callback: The function to call with the data. Signature must
             include `metadata`, `data`, and `cache` as parameters.
@@ -43,6 +44,7 @@ class AbstractRecordsOnlyAPI(AbstractAPI):
             return a response object with a csv file.
         :param kwargs: Additional arguments to pass to the callback function.
         :return: The result of the callback function.
+
         """
         if not callable(callback) or {"metadata", "data", "cache"} - set(
             callback.__code__.co_varnames
@@ -68,9 +70,7 @@ class AbstractRecordsOnlyAPI(AbstractAPI):
                     response.raise_for_status()
                     text = await response.text()
                     records_df = pd.read_csv(StringIO(text))
-                    return callback(
-                        metadata=records_df, data=None, cache=self.cache, **kwargs
-                    )
+                    return callback(records_df, None, self.cache, **kwargs)
             except aiohttp.ClientError as e:
                 self.logger.error(f"Error in GET request: {e}")
                 raise

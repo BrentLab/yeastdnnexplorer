@@ -27,7 +27,7 @@ nav:
 - Home: index.md
 - Tutorials:
   - Generate In-silico Data: tutorials/generate_in_silico_data.ipynb
-  - Database Interface: tutorials/database_interface.ipynb 
+  - Database Interface: tutorials/database_interface.ipynb
   - Hyperparameter Sweep: tutorials/hyperparameter_sweep.ipynb
   - Lightning Crash Course: tutorials/lightning_crash_course.ipynb
   - Testing Model Metrics: tutorials/testing_model_metrics.ipynb
