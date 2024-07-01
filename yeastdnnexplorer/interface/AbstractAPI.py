@@ -40,8 +40,8 @@ class AbstractAPI(ABC):
 
         """
         self.logger = logging.getLogger(__name__)
+        self._token = token or os.getenv("TOKEN", "")
         self.url = url or os.getenv("BASE_URL", "")
-        self.token = token or os.getenv("TOKEN", "")
         self.params = ParamsDict(
             params=kwargs.pop("params", {}),
             valid_keys=kwargs.pop("valid_keys", []),
