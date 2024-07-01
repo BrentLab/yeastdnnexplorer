@@ -136,6 +136,8 @@ celerybeat.pid
 
 # Environments
 .env
+# ignore .env files anywhere in the repo
+**/.env
 .venv
 env/
 venv/
