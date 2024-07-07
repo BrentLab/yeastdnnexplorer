@@ -1,3 +1,5 @@
+import gzip
+from io import BytesIO
 from typing import Any
 
 import pandas as pd
@@ -58,7 +60,7 @@ from yeastdnnexplorer.interface.AbstractRecordsAndFilesAPI import (
 #             assert response.status == 200
 
 
-def promotersetsig_csv_string() -> str:
+def promotersetsig_csv_gzip() -> bytes:
     # Define the data as a dictionary
     data = {
         "id": [10690, 10694, 10754, 10929, 10939],
@@ -86,7 +88,15 @@ def promotersetsig_csv_string() -> str:
     }
 
     # Create a DataFrame
-    return pd.DataFrame(data).to_csv(index=False)
+    df = pd.DataFrame(data)
+
+    # Convert the DataFrame to CSV and compress it using gzip
+    csv_buffer = BytesIO()
+    with gzip.GzipFile(fileobj=csv_buffer, mode="w") as gz:
+        df.to_csv(gz, index=False)
+
+    # Get the gzipped data as bytes
+    return csv_buffer.getvalue()
 
 
 class ConcreteRecordsAndFilesAPI(AbstractRecordsAndFilesAPI):
@@ -117,8 +127,8 @@ async def test_read_without_files(snapshot, api_client):
         m.get(
             "http://127.0.0.1:8001/api/promotersetsig/export",
             status=200,
-            body=promotersetsig_csv_string(),
-            headers={"Content-Type": "text/csv"},
+            body=promotersetsig_csv_gzip(),
+            headers={"Content-Type": "application/gzip"},
         )
 
         result = await api_client.read()
@@ -140,7 +150,7 @@ async def test_read_without_files(snapshot, api_client):
 #         rsps.add(
 #             responses.GET,
 #             "http://127.0.0.1:8001/api/promotersetsig/export",
-#             body=promotersetsig_csv_string(),
+#             body=promotersetsig_csv_gzip(),
 #             status=200,
 #             content_type="text/csv",
 #         )
@@ -177,7 +187,7 @@ async def test_read_without_files(snapshot, api_client):
 #                 return await create_mock_response(
 #                     url,
 #                     "GET",
-#                     promotersetsig_csv_string().encode(),
+#                     promotersetsig_csv_gzip().encode(),
 #                     "text/csv",
 #                     200,
 #                 )

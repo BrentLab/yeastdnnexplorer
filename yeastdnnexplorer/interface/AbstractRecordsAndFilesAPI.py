@@ -1,3 +1,4 @@
+import gzip
 import logging
 import os
 import tarfile
@@ -101,8 +102,9 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
                     export_url, headers=self.header, params=self.params
                 ) as response:
                     response.raise_for_status()
-                    text = await response.text()
-                    records_df = pd.read_csv(BytesIO(text.encode()))
+                    content = await response.content.read()
+                    with gzip.GzipFile(fileobj=BytesIO(content)) as f:
+                        records_df = pd.read_csv(f)
 
                     if not retrieve_files:
                         return callback(records_df, None, self.cache, **kwargs)
