@@ -1,6 +1,7 @@
+import gzip
 import logging
 from collections.abc import Callable
-from io import StringIO
+from io import BytesIO
 from typing import Any
 
 import aiohttp
@@ -68,8 +69,9 @@ class AbstractRecordsOnlyAPI(AbstractAPI):
                     params=self.params,
                 ) as response:
                     response.raise_for_status()
-                    text = await response.text()
-                    records_df = pd.read_csv(StringIO(text))
+                    content = await response.content.read()
+                    with gzip.GzipFile(fileobj=BytesIO(content)) as f:
+                        records_df = pd.read_csv(f)
                     return callback(records_df, None, self.cache, **kwargs)
             except aiohttp.ClientError as e:
                 self.logger.error(f"Error in GET request: {e}")
