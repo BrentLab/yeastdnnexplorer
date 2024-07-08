@@ -4,7 +4,6 @@
 [![style](https://img.shields.io/badge/%20style-sphinx-0a507a.svg)](https://www.sphinx-doc.org/en/master/usage/index.html)
 [![Pytest](https://github.com/BrentLab/yeastdnnexplorer/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/BrentLab/yeastdnnexplorer/actions/workflows/ci.yml)
 [![codecov](https://codecov.io/gh/BrentLab/yeastdnnexplorer/graph/badge.svg?token=D2AB7IUY7F)](https://codecov.io/gh/BrentLab/yeastdnnexplorer)
-[![gh-pages](https://github.com/BrentLab/yeastdnnexplorer/actions/workflows/docs.yml/badge.svg)](https://github.com/BrentLab/yeastdnnexplorer/actions/workflows/docs.yml)
 
 ## Documentation
 
