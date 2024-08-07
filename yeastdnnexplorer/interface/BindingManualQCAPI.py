@@ -49,7 +49,7 @@ class BindingManualQCAPI(AbstractRecordsOnlyAPI):
 
     @property
     def bulk_update_url_suffix(self) -> str:
-        """The URL suffix for updating multiple records in the same request"""
+        """The URL suffix for updating multiple records in the same request."""
         return self._bulk_update_url_suffix
 
     @bulk_update_url_suffix.setter
@@ -67,11 +67,10 @@ class BindingManualQCAPI(AbstractRecordsOnlyAPI):
         :type df: pd.DataFrame
         :param kwargs: Additional fields to include in the payload.
         :type kwargs: Any
-
         :return: The response from the POST request.
         :rtype: requests.Response
-
         :raises requests.RequestException: If the request fails.
+
         """
         bulk_update_url = (
             f"{self.url.rstrip('/')}/{self.bulk_update_url_suffix.rstrip('/')}/"

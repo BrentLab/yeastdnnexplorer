@@ -71,18 +71,17 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
         :param sample_size: The number of bytes to read from the file to detect the
             delimiter. Defaults to 1024.
         :type sample_size: int
-
         :return: The delimiter of the CSV file.
         :rtype: str
-
         :raises FileNotFoundError: If the file does not exist.
         :raises gzip.BadGzipFile: If the file is not a valid gzip file.
+
         """
         try:
             file = (
                 gzip.open(file_path, "rt")
                 if file_path.endswith(".gz")
-                else open(file_path, "rt")
+                else open(file_path)
             )
         except FileNotFoundError as exc:
             raise FileNotFoundError(f"File {file_path} not found.") from exc
@@ -175,7 +174,6 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
         :type session: aiohttp.ClientSession
         :param records_df: The DataFrame containing the records.
         :type records_df: pd.DataFrame
-
         :return: A dictionary where the keys are record IDs and the values are
             DataFrames of the associated files.
         :rtype: dict[str, pd.DataFrame]
@@ -197,12 +195,11 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
         :type session: aiohttp.ClientSession
         :param record_id: The ID of the record.
         :type record_id: int
-
         :return: A DataFrame containing the file's data.
         :rtype: pd.DataFrame
-
         :raises FileNotFoundError: If the file is not found in the tar archive.
         :raises ValueError: If the delimiter is not supported.
+
         """
         export_files_url = f"{self.url.rstrip('/')}/{self.export_files_url_suffix}"
         self.logger.debug("export_url: %s", export_files_url)
@@ -265,7 +262,8 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
                     # raise an error if the delimiter is not a "," or a "\t"
                     if delimiter not in [",", "\t"]:
                         raise ValueError(
-                            f"Delimiter {delimiter} is not supported. Supported delimiters are ',' and '\\t'."
+                            f"Delimiter {delimiter} is not supported. "
+                            "Supported delimiters are ',' and '\\t'."
                         )
 
                     df = pd.read_csv(csv_path, delimiter=delimiter)

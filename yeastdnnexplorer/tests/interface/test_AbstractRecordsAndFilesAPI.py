@@ -106,7 +106,7 @@ class ConcreteRecordsAndFilesAPI(AbstractRecordsAndFilesAPI):
     def create(self, data: dict[str, Any], **kwargs) -> Any:
         pass
 
-    def update(self, df: pd.DataFrame, **kwargs) -> Any:
+    def update(self, df: Any, **kwargs) -> Any:
         pass
 
     def delete(self, id: str, **kwargs) -> Any:
@@ -218,7 +218,7 @@ async def test_read_without_files(snapshot, api_client):
 #             assert all(isinstance(v, pd.DataFrame) \
 #                     for v in result.get("data").values())
 
-#### test the _detect_delimiter method ####
+# test the _detect_delimiter method ####
 
 
 def test_detect_delimiter_errors(api_client):
