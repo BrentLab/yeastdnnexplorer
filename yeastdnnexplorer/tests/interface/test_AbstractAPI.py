@@ -16,7 +16,7 @@ class ConcreteAPI(AbstractAPI):
     def read(self, **kwargs) -> dict[str, Any]:
         return {"id": id}  # Mock implementation for testing
 
-    def update(self, **kwargs) -> Any:
+    def update(self, df: Any, **kwargs) -> Any:
         pass  # Implement for testing if necessary
 
     def delete(self, id: str, **kwargs) -> Any:
