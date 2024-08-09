@@ -1,5 +1,6 @@
 import gzip
 from io import BytesIO
+from tempfile import NamedTemporaryFile
 from typing import Any
 
 import pandas as pd
@@ -105,7 +106,7 @@ class ConcreteRecordsAndFilesAPI(AbstractRecordsAndFilesAPI):
     def create(self, data: dict[str, Any], **kwargs) -> Any:
         pass
 
-    def update(self, **kwargs) -> Any:
+    def update(self, df: Any, **kwargs) -> Any:
         pass
 
     def delete(self, id: str, **kwargs) -> Any:
@@ -216,3 +217,60 @@ async def test_read_without_files(snapshot, api_client):
 #             assert len(result.get("data")) == 5
 #             assert all(isinstance(v, pd.DataFrame) \
 #                     for v in result.get("data").values())
+
+# test the _detect_delimiter method ####
+
+
+def test_detect_delimiter_errors(api_client):
+    # test that a FileNotFound error is raised if the file does not exist
+    with pytest.raises(FileNotFoundError):
+        api_client._detect_delimiter("non_existent_file.csv")
+
+    with NamedTemporaryFile(mode="w", suffix=".csv.gz") as tmpfile:
+        tmpfile.write("col1,col2,col3\nval1,val2,val3")
+        tmpfile.flush()
+        tmpfile_path = tmpfile.name
+
+        with pytest.raises(gzip.BadGzipFile):
+            api_client._detect_delimiter(tmpfile_path)
+
+
+def test_comma_delimiter(api_client):
+    with NamedTemporaryFile(mode="w", suffix=".csv") as tmpfile:
+        tmpfile.write("col1,col2,col3\nval1,val2,val3")
+        tmpfile.flush()
+        tmpfile_path = tmpfile.name
+
+        delimiter = api_client._detect_delimiter(tmpfile_path)
+        assert delimiter == ","
+
+
+def test_tab_delimiter(api_client):
+    with NamedTemporaryFile(mode="w", suffix=".csv") as tmpfile:
+        tmpfile.write("col1\tcol2\tcol3\nval1\tval2\tval3")
+        tmpfile.flush()
+        tmpfile_path = tmpfile.name
+
+        delimiter = api_client._detect_delimiter(tmpfile_path)
+        assert delimiter == "\t"
+
+
+def test_space_delimiter(api_client):
+    with NamedTemporaryFile(mode="w", suffix=".csv") as tmpfile:
+        tmpfile.write("col1 col2 col3\nval1 val2 val3")
+        tmpfile.flush()
+        tmpfile_path = tmpfile.name
+
+        delimiter = api_client._detect_delimiter(tmpfile_path)
+        assert delimiter == " "
+
+
+def test_gzipped_file(api_client):
+    with NamedTemporaryFile(suffix=".csv.gz") as tmpfile:
+        with gzip.open(tmpfile.name, "wt") as gzfile:
+            gzfile.write("col1,col2,col3\nval1,val2,val3")
+            gzfile.flush()
+        tmpfile_path = tmpfile.name
+
+        delimiter = api_client._detect_delimiter(tmpfile_path)
+        assert delimiter == ","

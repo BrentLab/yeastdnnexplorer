@@ -1,3 +1,4 @@
+import csv
 import gzip
 import logging
 import os
@@ -61,6 +62,39 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
     def export_files_url_suffix(self, value: str) -> None:
         self._export_files_url_suffix = value
 
+    def _detect_delimiter(self, file_path: str, sample_size: int = 1024) -> str:
+        """
+        Detect the delimiter of a CSV file.
+
+        :param file_path: The path to the CSV file.
+        :type file_path: str
+        :param sample_size: The number of bytes to read from the file to detect the
+            delimiter. Defaults to 1024.
+        :type sample_size: int
+        :return: The delimiter of the CSV file.
+        :rtype: str
+        :raises FileNotFoundError: If the file does not exist.
+        :raises gzip.BadGzipFile: If the file is not a valid gzip file.
+
+        """
+        try:
+            file = (
+                gzip.open(file_path, "rt")
+                if file_path.endswith(".gz")
+                else open(file_path)
+            )
+        except FileNotFoundError as exc:
+            raise FileNotFoundError(f"File {file_path} not found.") from exc
+
+        sample = file.read(sample_size)
+        sniffer = csv.Sniffer()
+        dialect = sniffer.sniff(sample)
+        delimiter = dialect.delimiter
+
+        file.close()
+
+        return delimiter
+
     async def read(
         self,
         callback: Callable[
@@ -79,10 +113,15 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
 
         :param callback: The function to call with the metadata. Signature must
             include `metadata`, `data`, and `cache`.
+        :type callback: Callable[[pd.DataFrame, dict[str, Any] | None, Any], Any]
         :param retrieve_files: Boolean. Whether to retrieve the files associated with
             the records. Defaults to False.
+        :type retrieve_files: bool
         :param kwargs: Additional arguments to pass to the callback function.
+        :type kwargs: Any
+
         :return: The result of the callback function.
+        :rtype: Any
 
         """
         if not callable(callback) or {"metadata", "data", "cache"} - set(
@@ -132,9 +171,12 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
         the database.
 
         :param session: The aiohttp ClientSession.
+        :type session: aiohttp.ClientSession
         :param records_df: The DataFrame containing the records.
+        :type records_df: pd.DataFrame
         :return: A dictionary where the keys are record IDs and the values are
             DataFrames of the associated files.
+        :rtype: dict[str, pd.DataFrame]
 
         """
         data_list = {}
@@ -150,8 +192,13 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
         database.
 
         :param session: The aiohttp ClientSession.
+        :type session: aiohttp.ClientSession
         :param record_id: The ID of the record.
+        :type record_id: int
         :return: A DataFrame containing the file's data.
+        :rtype: pd.DataFrame
+        :raises FileNotFoundError: If the file is not found in the tar archive.
+        :raises ValueError: If the delimiter is not supported.
 
         """
         export_files_url = f"{self.url.rstrip('/')}/{self.export_files_url_suffix}"
@@ -208,7 +255,18 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
 
                     # Read the extracted CSV file
                     csv_path = os.path.join(extract_dir, csv_filename)
-                    df = pd.read_csv(csv_path)
+                    self.logger.debug(f"Extracted file: {csv_path}")
+
+                    delimiter = self._detect_delimiter(csv_path)
+
+                    # raise an error if the delimiter is not a "," or a "\t"
+                    if delimiter not in [",", "\t"]:
+                        raise ValueError(
+                            f"Delimiter {delimiter} is not supported. "
+                            "Supported delimiters are ',' and '\\t'."
+                        )
+
+                    df = pd.read_csv(csv_path, delimiter=delimiter)
 
                     # Store the data in the cache
                     self._cache_set(cache_key, df.to_json())

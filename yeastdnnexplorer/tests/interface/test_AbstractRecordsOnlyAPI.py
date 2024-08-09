@@ -14,7 +14,7 @@ class ConcreteAPI(AbstractRecordsOnlyAPI):
     def create(self, data: dict[str, Any], **kwargs) -> Any:
         pass  # Implement for testing if necessary
 
-    def update(self, **kwargs) -> Any:
+    def update(self, df: Any, **kwargs) -> Any:
         pass  # Implement for testing if necessary
 
     def delete(self, id: str, **kwargs) -> Any:

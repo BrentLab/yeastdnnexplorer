@@ -3,6 +3,7 @@ import os
 from abc import ABC, abstractmethod
 from typing import Any
 
+import pandas as pd
 import requests  # type: ignore
 
 from yeastdnnexplorer.interface.Cache import Cache
@@ -135,7 +136,7 @@ class AbstractAPI(ABC):
         )
 
     @abstractmethod
-    def update(self, **kwargs) -> Any:
+    def update(self, df: pd.DataFrame, **kwargs) -> Any:
         """Placeholder for the update method."""
         raise NotImplementedError(
             f"`update()` is not implemented for {self.__class__.__name__}"
