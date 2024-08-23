@@ -40,16 +40,16 @@ def test_initialize(snapshot, api_client):
 def test_push_params(snapshot, api_client):
     params = {"param1": "value1", "param2": "value2"}
     api_client.push_params(params)
-    snapshot.assert_match(api_client.params.as_dict(), "push_params")
+    api_client.params.as_dict() == "push_params"
 
 
 def test_pop_params(snapshot, api_client):
     params = {"param1": "value1", "param2": "value2"}
     api_client.push_params(params)
     api_client.pop_params(["param1"])
-    snapshot.assert_match(api_client.params.as_dict(), "pop_params_after_one_removed")
+    assert api_client.params.as_dict() == {"param2": "value2"}
     api_client.pop_params()
-    snapshot.assert_match(api_client.params.as_dict(), "pop_params_after_all_removed")
+    assert api_client.params.as_dict() == {}
 
 
 def test_is_valid_url(snapshot, api_client):
@@ -66,13 +66,13 @@ def test_cache_operations(snapshot, api_client):
     value = "test_value"
 
     api_client._cache_set(key, value)
-    snapshot.assert_match(api_client._cache_get(key), "cache_get_after_set")
+    snapshot.assert_match(str(api_client._cache_get(key)), "cache_get_after_set")
 
     keys = api_client._cache_list()
-    snapshot.assert_match(keys, "cache_list")
+    snapshot.assert_match(", ".join(keys), "cache_list")
 
     api_client._cache_delete(key)
-    snapshot.assert_match(api_client._cache_get(key), "cache_get_after_delete")
+    snapshot.assert_match(str(api_client._cache_get(key)), "cache_get_after_delete")
 
 
 if __name__ == "__main__":

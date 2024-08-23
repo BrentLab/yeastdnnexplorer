@@ -33,6 +33,8 @@ class ExpressionAPI(AbstractRecordsAndFilesAPI):
                 "lab",
                 "assay",
                 "workflow",
+                "effect_colname",
+                "pvalue_colname",
             ],
         )
 

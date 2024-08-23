@@ -161,7 +161,7 @@ class AbstractAPI(ABC):
         try:
             response = requests.head(url, headers=self.header, allow_redirects=True)
             if response.status_code != 200:
-                raise ValueError(f"Invalid URL or token provided: {response.content}")
+                raise ValueError("Invalid URL or token provided. Check both.")
         except requests.RequestException as e:
             raise AttributeError(f"Error validating URL: {e}") from e
         except AttributeError as e:

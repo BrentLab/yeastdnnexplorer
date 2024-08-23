@@ -109,7 +109,9 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
         Retrieve data from the endpoint according to the `retrieve_files` parameter. If
         `retrieve_files` is False, the records will be returned as a dataframe. If
         `retrieve_files` is True, the files associated with the records will be
-        retrieved either from the local cache or from the database.
+        retrieved either from the local cache or from the database. Set `use_cache` to
+        False to avoid both checking/reading from the cache, and storing the data in in
+        the cache (see _retrieve_file() for details).
 
         :param callback: The function to call with the metadata. Signature must
             include `metadata`, `data`, and `cache`.
@@ -118,7 +120,7 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
             the records. Defaults to False.
         :type retrieve_files: bool
         :param kwargs: Additional arguments to pass to the callback function.
-        :type kwargs: Any
+            - use_cache: see _retrieve_file() for details
 
         :return: The result of the callback function.
         :rtype: Any
@@ -148,7 +150,9 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
                     if not retrieve_files:
                         return callback(records_df, None, self.cache, **kwargs)
                     else:
-                        data_list = await self._retrieve_files(session, records_df)
+                        data_list = await self._retrieve_files(
+                            session, records_df, **kwargs
+                        )
                         return callback(
                             records_df,
                             data_list,
@@ -164,7 +168,7 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
                 raise
 
     async def _retrieve_files(
-        self, session: aiohttp.ClientSession, records_df: pd.DataFrame
+        self, session: aiohttp.ClientSession, records_df: pd.DataFrame, **kwargs
     ) -> dict[str, pd.DataFrame]:
         """
         Retrieve files associated with the records either from the local cache or from
@@ -174,6 +178,9 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
         :type session: aiohttp.ClientSession
         :param records_df: The DataFrame containing the records.
         :type records_df: pd.DataFrame
+        :param kwargs: Additional arguments to pass to the callback function.
+            - use_cache: see _retrieve_file() for details
+
         :return: A dictionary where the keys are record IDs and the values are
             DataFrames of the associated files.
         :rtype: dict[str, pd.DataFrame]
@@ -181,11 +188,13 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
         """
         data_list = {}
         for record_id in records_df["id"]:
-            data_list[str(record_id)] = await self._retrieve_file(session, record_id)
+            data_list[str(record_id)] = await self._retrieve_file(
+                session, record_id, **kwargs
+            )
         return data_list
 
     async def _retrieve_file(
-        self, session: aiohttp.ClientSession, record_id: int
+        self, session: aiohttp.ClientSession, record_id: int, use_cache: bool = True
     ) -> pd.DataFrame:
         """
         Retrieve a file associated with a record either from the local cache or from the
@@ -195,30 +204,36 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
         :type session: aiohttp.ClientSession
         :param record_id: The ID of the record.
         :type record_id: int
+        :param use_cache: Whether to use the cache for retrieval AND storage -- if
+            False, the data will not be retrieved from the cache, nor will it be stored
+        :type use_cache: bool
         :return: A DataFrame containing the file's data.
         :rtype: pd.DataFrame
-        :raises FileNotFoundError: If the file is not found in the tar archive.
-        :raises ValueError: If the delimiter is not supported.
 
         """
         export_files_url = f"{self.url.rstrip('/')}/{self.export_files_url_suffix}"
         self.logger.debug("export_url: %s", export_files_url)
-        # Try to get the data from the cache first
-        cache_key = str(record_id)
-        cached_data = self._cache_get(cache_key)
-        if cached_data is not None:
-            logging.info(f"Record ID {record_id} retrieved from cache.")
-            return pd.read_json(BytesIO(cached_data.encode()))
+        # Try to get the data from cache if use_cache is True
+        if use_cache:
+            cache_key = str(record_id)
+            cached_data = self._cache_get(cache_key)
+            if cached_data is not None:
+                logging.info(f"Record ID {record_id} retrieved from cache.")
+                return pd.read_json(BytesIO(cached_data.encode()))
+            else:
+                logging.info(f"Record ID {record_id} not found in cache.")
 
-        # Retrieve from the database if not in cache
-        logging.info(
-            f"Record ID {record_id} not found in cache. Retrieving from the database."
-        )
+        # Retrieve from the database if not in cache or use_cache is False
         try:
             header = self.header.copy()
             header["Content-Type"] = "application/gzip"
+            retrieve_files_params = self.params.copy()
+            retrieve_files_params.update({"id": record_id})
             async with session.get(
-                export_files_url, headers=header, params={"id": record_id}, timeout=120
+                export_files_url,
+                headers=header,
+                params=retrieve_files_params,
+                timeout=120,
             ) as response:
                 response.raise_for_status()
                 tar_data = await response.read()
@@ -269,7 +284,8 @@ class AbstractRecordsAndFilesAPI(AbstractAPI):
                     df = pd.read_csv(csv_path, delimiter=delimiter)
 
                     # Store the data in the cache
-                    self._cache_set(cache_key, df.to_json())
+                    if use_cache:
+                        self._cache_set(cache_key, df.to_json())
             finally:
                 os.unlink(tar_file.name)
 

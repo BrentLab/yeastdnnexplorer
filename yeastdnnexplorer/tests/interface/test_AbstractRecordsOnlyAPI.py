@@ -1,3 +1,4 @@
+import gzip
 from typing import Any
 
 import pandas as pd
@@ -42,11 +43,14 @@ async def test_read(snapshot, api_client):
             "10939,1,2024-03-26,1,2024-03-26 14:29:47.853980+00:00,4327,4,6,5,promotersetsig/10939.csv.gz"  # noqa: E501
         )
 
+        # Convert to bytes and gzip the content
+        gzipped_csv = gzip.compress(mocked_csv.encode("utf-8"))
+
         m.get(
             "https://example.com/api/endpoint/export",
             status=200,
-            body=mocked_csv,
-            headers={"Content-Type": "text/csv"},
+            body=gzipped_csv,
+            headers={"Content-Type": "application/gzip"},
         )
 
         result = await api_client.read()
