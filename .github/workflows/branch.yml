@@ -1,0 +1,34 @@
+name: yeastdnnexplorer branch protection
+# This workflow is triggered on PRs to master branch on the repository
+# It fails when someone tries to make a PR against the nf-core `master` branch instead of `dev`
+# copied from nf-core/sarek
+on:
+  pull_request_target:
+    branches: [main]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      # PRs to the repo main branch are only ok if coming from the repo `dev` or any `patch` branches
+      - name: Check PRs
+        if: github.repository == 'BrentLab/yeastdnnexplorer'
+        run: |
+          { [[ ${{github.event.pull_request.head.repo.full_name }} == BrentLab/yeastdnnexplorer ]] && [[ $GITHUB_HEAD_REF == "dev" ]]; } || [[ $GITHUB_HEAD_REF == "patch" ]]
+
+      # If the above check failed, post a comment on the PR explaining the failure
+      # NOTE - this doesn't currently work if the PR is coming from a fork, due to limitations in GitHub actions secrets
+      - name: Post PR comment
+        if: failure()
+        uses: mshick/add-pr-comment@b8f338c590a895d50bcbfa6c5859251edc8952fc # v2
+        with:
+          message: |
+            ## This PR is against the `main` branch :x:
+
+            * Do not close this PR
+            * Click _Edit_ and change the `base` to `dev`
+            * This CI test will remain failed until you push a new commit
+
+            ---
+
+            Hi @${{ github.event.pull_request.user.login }},
