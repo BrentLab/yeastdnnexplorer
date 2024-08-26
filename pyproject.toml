@@ -23,6 +23,7 @@ jupyter = "^1.0.0"
 requests = "^2.32.3"
 cachetools = "^5.3.3"
 python-dotenv = "^1.0.1"
+statsmodels = "^0.14.1"
 
 [tool.poetry.group.dev.dependencies]
 jupyter = "^1.0.0"
