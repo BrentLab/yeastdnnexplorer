@@ -2632,27 +2632,11 @@
 <span class="normal">627</span>
 <span class="normal">628</span>
 <span class="normal">629</span>
-<span class="normal">630</span>
-<span class="normal">631</span>
-<span class="normal">632</span>
-<span class="normal">633</span>
-<span class="normal">634</span>
-<span class="normal">635</span>
-<span class="normal">636</span>
-<span class="normal">637</span>
-<span class="normal">638</span>
-<span class="normal">639</span>
-<span class="normal">640</span>
-<span class="normal">641</span>
-<span class="normal">642</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">GeneralizedLogisticModel</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generalized logistic model for fitting sigmoidal curves to data.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="normal">630</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">GeneralizedLogisticModel</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generalized logistic model for fitting sigmoidal curves to data.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Initialize the generalized logistic model.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize the generalized logistic model.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_right_asymptote</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -2669,9 +2653,7 @@
 
 <span class="sd">        :param value: The input data matrix. Must be two dimensional even if there is</span>
 <span class="sd">            only one predictor.</span>
-
 <span class="sd">        :return: The input data matrix.</span>
-
 <span class="sd">        :raises TypeError: if X is not a NumPy array.</span>
 <span class="sd">        :raises ValueError: if X is not 2D.</span>
 <span class="sd">        :raises ValueError: if the number of columns in X does not match the length of</span>
@@ -2706,9 +2688,7 @@
 <span class="sd">        Set the response variable for the model.</span>
 
 <span class="sd">        :param value: The observed output data.</span>
-
 <span class="sd">        :return: The observed output data.</span>
-
 <span class="sd">        :raises TypeError: if y is not a NumPy array or a list.</span>
 <span class="sd">        :raises ValueError: if the number of rows in y does not match the number of rows</span>
 <span class="sd">            in X.</span>
@@ -2734,9 +2714,7 @@
 <span class="sd">        Set the upper asymptote for the model. This parameter can be inferred by `fit()`</span>
 
 <span class="sd">        :param value: The upper asymptote of the sigmoid function.</span>
-
 <span class="sd">        :return: The upper asymptote of the sigmoid function.</span>
-
 <span class="sd">        :raises TypeError: if the upper asymptote is not a real number.</span>
 <span class="sd">        :raises ValueError: if the upper asymptote is less than the lower asymptote.</span>
 
@@ -2757,7 +2735,6 @@
 <span class="sd">        `fit()`</span>
 
 <span class="sd">        :return: The lower asymptote of the sigmoid function.</span>
-
 <span class="sd">        :raises TypeError: if the lower asymptote is not a real number.</span>
 <span class="sd">        :raises ValueError: if the lower asymptote is greater than the upper asymptote.</span>
 
@@ -2777,9 +2754,7 @@
 <span class="sd">        Set the coefficients for the model. This parameter can be inferred by `fit()`</span>
 
 <span class="sd">        :param value: The coefficients of the sigmoid function.</span>
-
 <span class="sd">        :return: The coefficients of the sigmoid function.</span>
-
 <span class="sd">        :raises TypeError: if the coefficients are not a NumPy array or a list.</span>
 <span class="sd">        :raises ValueError: if the length of the coefficients does not match the number</span>
 <span class="sd">            of columns in X or the number of inflection points.</span>
@@ -2809,8 +2784,8 @@
 <span class="sd">        `fit()`</span>
 
 <span class="sd">        :return: The covariance matrix of the model parameters.</span>
-
 <span class="sd">        :raises TypeError: if the covariance matrix is not a NumPy array.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov</span>
 
@@ -2826,8 +2801,8 @@
 <span class="sd">        The residuals of the model. This parameter can be inferred by `fit()`</span>
 
 <span class="sd">        :return: The residuals of the model.</span>
-
 <span class="sd">        :raises TypeError: if the residuals are not a NumPy array.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_residuals</span>
 
@@ -2843,8 +2818,8 @@
 <span class="sd">        The Jacobian matrix of the model. This parameter can be inferred by `fit()`</span>
 
 <span class="sd">        :return: The Jacobian matrix of the model.</span>
-
 <span class="sd">        :raises TypeError: if the Jacobian matrix is not a NumPy array.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jacobian</span>
 
@@ -2878,6 +2853,7 @@
 <span class="sd">        :return: The residual degrees of freedom of the model.</span>
 
 <span class="sd">        :raises AssertionError: if the input data matrix X is not available.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Input data matrix X is not available.&quot;</span>
         <span class="c1"># Number of parameters = number of coefficients + 2 (for the two asymptotes)</span>
@@ -2889,8 +2865,8 @@
 <span class="sd">        The mean squared error of the model.</span>
 
 <span class="sd">        :return: The mean squared error of the model.</span>
-
 <span class="sd">        :raises AttributeError: if the residuals are not available.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Residuals are not available.&quot;</span><span class="p">)</span>
@@ -2902,8 +2878,8 @@
 <span class="sd">        The residual sum of squares of the model.</span>
 
 <span class="sd">        :return: The residual sum of squares of the model.</span>
-
 <span class="sd">        :raises AttributeError: if the residuals are not available.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Residuals are not available.&quot;</span><span class="p">)</span>
@@ -2915,8 +2891,8 @@
 <span class="sd">        The total sum of squares of the model.</span>
 
 <span class="sd">        :return: The total sum of squares of the model.</span>
-
 <span class="sd">        :raises AttributeError: if the output data y is not available.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Output data y is not available.&quot;</span><span class="p">)</span>
@@ -2930,6 +2906,7 @@
 <span class="sd">        :return: The variance explained by the model.</span>
 
 <span class="sd">        :raises AttributeError: `rss` or `tss` is not available</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
@@ -2947,8 +2924,8 @@
 <span class="sd">        The log-likelihood of the model. Note that this assumes Gaussian residuals.</span>
 
 <span class="sd">        :return: The log-likelihood of the model.</span>
-
 <span class="sd">        :raises AttributeError: if the residuals or y are not available.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Residuals are not available.&quot;</span><span class="p">)</span>
@@ -2981,8 +2958,8 @@
 <span class="sd">        Calculate the Akaike Information Criterion (AIC) for the model.</span>
 
 <span class="sd">        :return: The Akaike Information Criterion (AIC) for the model.</span>
-
 <span class="sd">        :raises AttributeError: if the log-likelihood is not available.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">llf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Log-likelihood is not available.&quot;</span><span class="p">)</span>
@@ -2994,8 +2971,8 @@
 <span class="sd">        Calculate the Bayesian Information Criterion (BIC) for the model.</span>
 
 <span class="sd">        :return: The Bayesian Information Criterion (BIC) for the model.</span>
-
 <span class="sd">        :raises AttributeError: if the log-likelihood or X is not available.</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">llf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Log-likelihood is not available.&quot;</span><span class="p">)</span>
@@ -3009,9 +2986,7 @@
 <span class="sd">        Make predictions using the generalized logistic model.</span>
 
 <span class="sd">        :param X: Input data matrix</span>
-
 <span class="sd">        :return: Predictions based on the learned model parameters</span>
-
 <span class="sd">        :raises ValueError: if the model has not been fitted.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -3232,6 +3207,7 @@
 <span class="sd">            plots to show.</span>
 <span class="sd">        :param interactor_diagnostic: Boolean to include interactor diagnostic</span>
 <span class="sd">            plot (default False).</span>
+
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Model must be fitted before plotting diagnostics.&quot;</span><span class="p">)</span>
@@ -4507,21 +4483,17 @@
 
           <details class="quote">
             <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">24</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">22</span>
+<span class="normal">23</span>
+<span class="normal">24</span>
 <span class="normal">25</span>
 <span class="normal">26</span>
 <span class="normal">27</span>
 <span class="normal">28</span>
 <span class="normal">29</span>
 <span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span>
-<span class="normal">33</span>
-<span class="normal">34</span>
-<span class="normal">35</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Initialize the generalized logistic model.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="normal">31</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Initialize the generalized logistic model.&quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_right_asymptote</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -4601,24 +4573,24 @@
 
           <details class="quote">
             <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">351</span>
-<span class="normal">352</span>
-<span class="normal">353</span>
-<span class="normal">354</span>
-<span class="normal">355</span>
-<span class="normal">356</span>
-<span class="normal">357</span>
-<span class="normal">358</span>
-<span class="normal">359</span>
-<span class="normal">360</span>
-<span class="normal">361</span>
-<span class="normal">362</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">aic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">340</span>
+<span class="normal">341</span>
+<span class="normal">342</span>
+<span class="normal">343</span>
+<span class="normal">344</span>
+<span class="normal">345</span>
+<span class="normal">346</span>
+<span class="normal">347</span>
+<span class="normal">348</span>
+<span class="normal">349</span>
+<span class="normal">350</span>
+<span class="normal">351</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">aic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the Akaike Information Criterion (AIC) for the model.</span>
 
 <span class="sd">    :return: The Akaike Information Criterion (AIC) for the model.</span>
-
 <span class="sd">    :raises AttributeError: if the log-likelihood is not available.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">llf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Log-likelihood is not available.&quot;</span><span class="p">)</span>
@@ -4695,26 +4667,26 @@
 
           <details class="quote">
             <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">364</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span>
+<span class="normal">363</span>
+<span class="normal">364</span>
 <span class="normal">365</span>
-<span class="normal">366</span>
-<span class="normal">367</span>
-<span class="normal">368</span>
-<span class="normal">369</span>
-<span class="normal">370</span>
-<span class="normal">371</span>
-<span class="normal">372</span>
-<span class="normal">373</span>
-<span class="normal">374</span>
-<span class="normal">375</span>
-<span class="normal">376</span>
-<span class="normal">377</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">bic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">366</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">bic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the Bayesian Information Criterion (BIC) for the model.</span>
 
 <span class="sd">    :return: The Bayesian Information Criterion (BIC) for the model.</span>
-
 <span class="sd">    :raises AttributeError: if the log-likelihood or X is not available.</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">llf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Log-likelihood is not available.&quot;</span><span class="p">)</span>
@@ -4776,7 +4748,20 @@ https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.ht
 
           <details class="quote">
             <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">414</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">401</span>
+<span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span>
+<span class="normal">413</span>
+<span class="normal">414</span>
 <span class="normal">415</span>
 <span class="normal">416</span>
 <span class="normal">417</span>
@@ -4821,20 +4806,7 @@ https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.ht
 <span class="normal">456</span>
 <span class="normal">457</span>
 <span class="normal">458</span>
-<span class="normal">459</span>
-<span class="normal">460</span>
-<span class="normal">461</span>
-<span class="normal">462</span>
-<span class="normal">463</span>
-<span class="normal">464</span>
-<span class="normal">465</span>
-<span class="normal">466</span>
-<span class="normal">467</span>
-<span class="normal">468</span>
-<span class="normal">469</span>
-<span class="normal">470</span>
-<span class="normal">471</span>
-<span class="normal">472</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">459</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Fit the model to the data. This uses `scipy.optimize.curve_fit` to optimize the</span>
 <span class="sd">    model parameters. See</span>
@@ -4960,17 +4932,17 @@ https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.ht
 
           <details class="quote">
             <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">402</span>
-<span class="normal">403</span>
-<span class="normal">404</span>
-<span class="normal">405</span>
-<span class="normal">406</span>
-<span class="normal">407</span>
-<span class="normal">408</span>
-<span class="normal">409</span>
-<span class="normal">410</span>
-<span class="normal">411</span>
-<span class="normal">412</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">389</span>
+<span class="normal">390</span>
+<span class="normal">391</span>
+<span class="normal">392</span>
+<span class="normal">393</span>
+<span class="normal">394</span>
+<span class="normal">395</span>
+<span class="normal">396</span>
+<span class="normal">397</span>
+<span class="normal">398</span>
+<span class="normal">399</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set the predictor and response variables for the model.</span>
 
@@ -5053,7 +5025,20 @@ https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.ht
 
           <details class="quote">
             <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">590</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">577</span>
+<span class="normal">578</span>
+<span class="normal">579</span>
+<span class="normal">580</span>
+<span class="normal">581</span>
+<span class="normal">582</span>
+<span class="normal">583</span>
+<span class="normal">584</span>
+<span class="normal">585</span>
+<span class="normal">586</span>
+<span class="normal">587</span>
+<span class="normal">588</span>
+<span class="normal">589</span>
+<span class="normal">590</span>
 <span class="normal">591</span>
 <span class="normal">592</span>
 <span class="normal">593</span>
@@ -5093,19 +5078,7 @@ https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.ht
 <span class="normal">627</span>
 <span class="normal">628</span>
 <span class="normal">629</span>
-<span class="normal">630</span>
-<span class="normal">631</span>
-<span class="normal">632</span>
-<span class="normal">633</span>
-<span class="normal">634</span>
-<span class="normal">635</span>
-<span class="normal">636</span>
-<span class="normal">637</span>
-<span class="normal">638</span>
-<span class="normal">639</span>
-<span class="normal">640</span>
-<span class="normal">641</span>
-<span class="normal">642</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span>
+<span class="normal">630</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">plots_to_display</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
     <span class="n">interactor_diagnostic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
@@ -5122,6 +5095,7 @@ https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.ht
 <span class="sd">        plots to show.</span>
 <span class="sd">    :param interactor_diagnostic: Boolean to include interactor diagnostic</span>
 <span class="sd">        plot (default False).</span>
+
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Model must be fitted before plotting diagnostics.&quot;</span><span class="p">)</span>
@@ -5259,7 +5233,18 @@ https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.ht
 
           <details class="quote">
             <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">379</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
+<span class="normal">375</span>
+<span class="normal">376</span>
+<span class="normal">377</span>
+<span class="normal">378</span>
+<span class="normal">379</span>
 <span class="normal">380</span>
 <span class="normal">381</span>
 <span class="normal">382</span>
@@ -5267,27 +5252,12 @@ https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.ht
 <span class="normal">384</span>
 <span class="normal">385</span>
 <span class="normal">386</span>
-<span class="normal">387</span>
-<span class="normal">388</span>
-<span class="normal">389</span>
-<span class="normal">390</span>
-<span class="normal">391</span>
-<span class="normal">392</span>
-<span class="normal">393</span>
-<span class="normal">394</span>
-<span class="normal">395</span>
-<span class="normal">396</span>
-<span class="normal">397</span>
-<span class="normal">398</span>
-<span class="normal">399</span>
-<span class="normal">400</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">387</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Make predictions using the generalized logistic model.</span>
 
 <span class="sd">    :param X: Input data matrix</span>
-
 <span class="sd">    :return: Predictions based on the learned model parameters</span>
-
 <span class="sd">    :raises ValueError: if the model has not been fitted.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -5351,7 +5321,20 @@ models with one less predictor in each iteration.</p>
 
           <details class="quote">
             <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">474</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">461</span>
+<span class="normal">462</span>
+<span class="normal">463</span>
+<span class="normal">464</span>
+<span class="normal">465</span>
+<span class="normal">466</span>
+<span class="normal">467</span>
+<span class="normal">468</span>
+<span class="normal">469</span>
+<span class="normal">470</span>
+<span class="normal">471</span>
+<span class="normal">472</span>
+<span class="normal">473</span>
+<span class="normal">474</span>
 <span class="normal">475</span>
 <span class="normal">476</span>
 <span class="normal">477</span>
@@ -5452,20 +5435,7 @@ models with one less predictor in each iteration.</p>
 <span class="normal">572</span>
 <span class="normal">573</span>
 <span class="normal">574</span>
-<span class="normal">575</span>
-<span class="normal">576</span>
-<span class="normal">577</span>
-<span class="normal">578</span>
-<span class="normal">579</span>
-<span class="normal">580</span>
-<span class="normal">581</span>
-<span class="normal">582</span>
-<span class="normal">583</span>
-<span class="normal">584</span>
-<span class="normal">585</span>
-<span class="normal">586</span>
-<span class="normal">587</span>
-<span class="normal">588</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">575</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Print a summary of the generalized logistic model.</span>
 
