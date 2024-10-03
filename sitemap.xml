@@ -2,158 +2,166 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/data_loaders/real_data_loader/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/data_loaders/synthetic_data_loader/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/interface/AbstractAPI/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/interface/AbstractRecordsAndFilesAPI/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/interface/AbstractRecordsOnlyAPI/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/interface/BindingAPI/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/interface/BindingManualQCAPI/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/interface/Cache/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/interface/CallingCardsBackgroundAPI/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/interface/DataSourceAPI/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/interface/ExpressionAPI/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/interface/ExpressionManualQCAPI/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/interface/FileFormatAPI/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/interface/GenomicFeatureAPI/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/interface/ParamsDict/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/interface/PromoterSetAPI/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/interface/PromoterSetSigAPI/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/interface/RegulatorAPI/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
+    </url>
+    <url>
+         <loc>https://brentlab.github.io/yeastdnnexplorer/ml_models/GeneralizedLogisticModel/</loc>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/ml_models/customizable_model/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/ml_models/metrics_compute_nrmse/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/ml_models/metrics_smse/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/ml_models/simple_model/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/probability_models/GenePopulation/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/probability_models/default_perturbation_effect_adjustment_function/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/probability_models/generate_binding_effects/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/probability_models/generate_gene_population/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/probability_models/generate_perturbation_effects/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/probability_models/generate_pvalues/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/probability_models/perturbation_effect_adjustment_function_with_tf_relationships/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/probability_models/perturbation_effect_adjustment_function_with_tf_relationships_boolean_logic/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/probability_models/relation_classes/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/tutorials/database_interface/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/tutorials/exploring_perturbation_response_relationship/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
+    </url>
+    <url>
+         <loc>https://brentlab.github.io/yeastdnnexplorer/tutorials/generalized_logistic_models/</loc>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/tutorials/generate_in_silico_data/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/tutorials/hyperparameter_sweep/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/tutorials/lightning_crash_course/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/tutorials/testing_model_metrics/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
     <url>
          <loc>https://brentlab.github.io/yeastdnnexplorer/tutorials/visualizing_and_testing_data_generation_methods/</loc>
-         <lastmod>2024-09-12</lastmod>
+         <lastmod>2024-10-03</lastmod>
     </url>
 </urlset>
