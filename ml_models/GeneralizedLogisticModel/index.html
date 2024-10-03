@@ -934,24 +934,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#yeastdnnexplorer.ml_models.GeneralizedLogisticModel.calculate_nonlinear_leverage" class="md-nav__link">
-    <span class="md-ellipsis">
-      calculate_nonlinear_leverage
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#yeastdnnexplorer.ml_models.GeneralizedLogisticModel.cooks_distance" class="md-nav__link">
-    <span class="md-ellipsis">
-      cooks_distance
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1898,24 +1880,6 @@
   
 </li>
       
-        <li class="md-nav__item">
-  <a href="#yeastdnnexplorer.ml_models.GeneralizedLogisticModel.calculate_nonlinear_leverage" class="md-nav__link">
-    <span class="md-ellipsis">
-      calculate_nonlinear_leverage
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#yeastdnnexplorer.ml_models.GeneralizedLogisticModel.cooks_distance" class="md-nav__link">
-    <span class="md-ellipsis">
-      cooks_distance
-    </span>
-  </a>
-  
-</li>
-      
     </ul>
   
 </nav>
@@ -1967,10 +1931,28 @@
 
   <div class="doc doc-contents ">
 
+  
+      <p>Generalized logistic model for fitting sigmoidal curves to data.</p>
 
             <details class="quote">
               <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 35</span>
+              <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal"> 19</span>
+<span class="normal"> 20</span>
+<span class="normal"> 21</span>
+<span class="normal"> 22</span>
+<span class="normal"> 23</span>
+<span class="normal"> 24</span>
+<span class="normal"> 25</span>
+<span class="normal"> 26</span>
+<span class="normal"> 27</span>
+<span class="normal"> 28</span>
+<span class="normal"> 29</span>
+<span class="normal"> 30</span>
+<span class="normal"> 31</span>
+<span class="normal"> 32</span>
+<span class="normal"> 33</span>
+<span class="normal"> 34</span>
+<span class="normal"> 35</span>
 <span class="normal"> 36</span>
 <span class="normal"> 37</span>
 <span class="normal"> 38</span>
@@ -2577,20 +2559,15 @@
 <span class="normal">639</span>
 <span class="normal">640</span>
 <span class="normal">641</span>
-<span class="normal">642</span>
-<span class="normal">643</span>
-<span class="normal">644</span>
-<span class="normal">645</span>
-<span class="normal">646</span>
-<span class="normal">647</span>
-<span class="normal">648</span>
-<span class="normal">649</span>
-<span class="normal">650</span>
-<span class="normal">651</span>
-<span class="normal">652</span>
-<span class="normal">653</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">GeneralizedLogisticModel</span><span class="p">:</span>
+<span class="normal">642</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">class</span> <span class="nc">GeneralizedLogisticModel</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generalized logistic model for fitting sigmoidal curves to data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Generalized logistic function with an interactor term.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the generalized logistic model.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_right_asymptote</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -2607,12 +2584,12 @@
 
 <span class="sd">        :param value: The input data matrix. Must be two dimensional even if there is</span>
 <span class="sd">            only one predictor.</span>
-<span class="sd">        :type value: np.ndarray</span>
+
 <span class="sd">        :return: The input data matrix.</span>
-<span class="sd">        :rtype: np.ndarray</span>
-<span class="sd">        :raises: TypeError if X is not a NumPy array.</span>
-<span class="sd">        :raises: ValueError if X is not 2D.</span>
-<span class="sd">        :raises: ValueError if the number of columns in X does not match the length of</span>
+
+<span class="sd">        :raises TypeError: if X is not a NumPy array.</span>
+<span class="sd">        :raises ValueError: if X is not 2D.</span>
+<span class="sd">        :raises ValueError: if the number of columns in X does not match the length of</span>
 <span class="sd">            the inflection point or coefficients.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -2644,11 +2621,11 @@
 <span class="sd">        Set the response variable for the model.</span>
 
 <span class="sd">        :param value: The observed output data.</span>
-<span class="sd">        :type value: np.ndarray</span>
+
 <span class="sd">        :return: The observed output data.</span>
-<span class="sd">        :rtype: np.ndarray</span>
-<span class="sd">        :raises: TypeError if y is not a NumPy array or a list.</span>
-<span class="sd">        :raises: ValueError if the number of rows in y does not match the number of rows</span>
+
+<span class="sd">        :raises TypeError: if y is not a NumPy array or a list.</span>
+<span class="sd">        :raises ValueError: if the number of rows in y does not match the number of rows</span>
 <span class="sd">            in X.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -2672,11 +2649,11 @@
 <span class="sd">        Set the upper asymptote for the model. This parameter can be inferred by `fit()`</span>
 
 <span class="sd">        :param value: The upper asymptote of the sigmoid function.</span>
-<span class="sd">        :type value: float</span>
+
 <span class="sd">        :return: The upper asymptote of the sigmoid function.</span>
-<span class="sd">        :rtype: float</span>
-<span class="sd">        :raises: TypeError if the upper asymptote is not a real number.</span>
-<span class="sd">        :raises: ValueError if the upper asymptote is less than the lower asymptote.</span>
+
+<span class="sd">        :raises TypeError: if the upper asymptote is not a real number.</span>
+<span class="sd">        :raises ValueError: if the upper asymptote is less than the lower asymptote.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_right_asymptote</span>
@@ -2695,9 +2672,9 @@
 <span class="sd">        `fit()`</span>
 
 <span class="sd">        :return: The lower asymptote of the sigmoid function.</span>
-<span class="sd">        :rtype: float</span>
-<span class="sd">        :raises: TypeError if the lower asymptote is not a real number.</span>
-<span class="sd">        :raises: ValueError if the lower asymptote is greater than the upper asymptote.</span>
+
+<span class="sd">        :raises TypeError: if the lower asymptote is not a real number.</span>
+<span class="sd">        :raises ValueError: if the lower asymptote is greater than the upper asymptote.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_left_asymptote</span>
@@ -2715,11 +2692,11 @@
 <span class="sd">        Set the coefficients for the model. This parameter can be inferred by `fit()`</span>
 
 <span class="sd">        :param value: The coefficients of the sigmoid function.</span>
-<span class="sd">        :type value: np.ndarray</span>
+
 <span class="sd">        :return: The coefficients of the sigmoid function.</span>
-<span class="sd">        :rtype: np.ndarray</span>
-<span class="sd">        :raises: TypeError if the coefficients are not a NumPy array or a list.</span>
-<span class="sd">        :raises: ValueError if the length of the coefficients does not match the number</span>
+
+<span class="sd">        :raises TypeError: if the coefficients are not a NumPy array or a list.</span>
+<span class="sd">        :raises ValueError: if the length of the coefficients does not match the number</span>
 <span class="sd">            of columns in X or the number of inflection points.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -2747,9 +2724,8 @@
 <span class="sd">        `fit()`</span>
 
 <span class="sd">        :return: The covariance matrix of the model parameters.</span>
-<span class="sd">        :rtype: np.ndarray</span>
-<span class="sd">        :raises: TypeError if the covariance matrix is not a NumPy array.</span>
 
+<span class="sd">        :raises TypeError: if the covariance matrix is not a NumPy array.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_cov</span>
 
@@ -2765,9 +2741,8 @@
 <span class="sd">        The residuals of the model. This parameter can be inferred by `fit()`</span>
 
 <span class="sd">        :return: The residuals of the model.</span>
-<span class="sd">        :rtype: np.ndarray</span>
-<span class="sd">        :raises: TypeError if the residuals are not a NumPy array.</span>
 
+<span class="sd">        :raises TypeError: if the residuals are not a NumPy array.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_residuals</span>
 
@@ -2783,9 +2758,8 @@
 <span class="sd">        The Jacobian matrix of the model. This parameter can be inferred by `fit()`</span>
 
 <span class="sd">        :return: The Jacobian matrix of the model.</span>
-<span class="sd">        :rtype: np.ndarray</span>
-<span class="sd">        :raises: TypeError if the Jacobian matrix is not a NumPy array.</span>
 
+<span class="sd">        :raises TypeError: if the Jacobian matrix is not a NumPy array.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_jacobian</span>
 
@@ -2801,7 +2775,7 @@
 <span class="sd">        The number of parameters in the model.</span>
 
 <span class="sd">        :return: The number of parameters in the model.</span>
-<span class="sd">        :raises: AttributeError if the coefficients are not available.</span>
+<span class="sd">        :raises AttributeError: if the coefficients are not available.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2817,11 +2791,10 @@
 <span class="sd">        Residual degrees of freedom = number of observations - number of parameters</span>
 
 <span class="sd">        :return: The residual degrees of freedom of the model.</span>
-<span class="sd">        :rtype: int</span>
 
+<span class="sd">        :raises AssertionError: if the input data matrix X is not available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="k">return</span> <span class="mi">0</span>
+        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Input data matrix X is not available.&quot;</span>
         <span class="c1"># Number of parameters = number of coefficients + 2 (for the two asymptotes)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_params</span>
 
@@ -2831,9 +2804,8 @@
 <span class="sd">        The mean squared error of the model.</span>
 
 <span class="sd">        :return: The mean squared error of the model.</span>
-<span class="sd">        :rtype: float</span>
-<span class="sd">        :raises: AttributeError if the residuals are not available.</span>
 
+<span class="sd">        :raises AttributeError: if the residuals are not available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Residuals are not available.&quot;</span><span class="p">)</span>
@@ -2845,9 +2817,8 @@
 <span class="sd">        The residual sum of squares of the model.</span>
 
 <span class="sd">        :return: The residual sum of squares of the model.</span>
-<span class="sd">        :rtype: float</span>
-<span class="sd">        :raises: AttributeError if the residuals are not available.</span>
 
+<span class="sd">        :raises AttributeError: if the residuals are not available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Residuals are not available.&quot;</span><span class="p">)</span>
@@ -2859,11 +2830,11 @@
 <span class="sd">        The total sum of squares of the model.</span>
 
 <span class="sd">        :return: The total sum of squares of the model.</span>
-<span class="sd">        :rtype: float</span>
-<span class="sd">        :raises: AssertionError if the output data y is not available.</span>
 
+<span class="sd">        :raises AttributeError: if the output data y is not available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Output data y is not available.&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Output data y is not available.&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">))</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
 
     <span class="nd">@property</span>
@@ -2872,27 +2843,33 @@
 <span class="sd">        The variance explained by the model.</span>
 
 <span class="sd">        :return: The variance explained by the model.</span>
-<span class="sd">        :rtype: float</span>
-<span class="sd">        :raises AssertionError: If the residuals are not available.</span>
 
+<span class="sd">        :raises AttributeError: `rss` or `tss` is not available</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">rss</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;RSS is not available.&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">tss</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;TSS is not available.&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">rss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">&quot;`rss` is not available. Check that `fit()` has been run.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">tss</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span>
+                <span class="s2">&quot;`tss` is not available. Check that `model()` has been run.&quot;</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="mi">1</span> <span class="o">-</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rss</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">tss</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">llf</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        The log-likelihood of the model.</span>
+<span class="sd">        The log-likelihood of the model. Note that this assumes Gaussian residuals.</span>
 
 <span class="sd">        :return: The log-likelihood of the model.</span>
-<span class="sd">        :rtype: float</span>
-<span class="sd">        :raises: AttributeError if the residuals are not available.</span>
 
+<span class="sd">        :raises AttributeError: if the residuals or y are not available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Residuals are not available.&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Residuals are not available.&quot;</span><span class="p">)</span>
         <span class="c1"># Number of observations</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Output data y is not available.&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Output data y is not available.&quot;</span><span class="p">)</span>
         <span class="n">n</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">y</span><span class="p">)</span>
 
         <span class="c1"># Variance of the residuals (sigma^2). denominator is N, not N-1. ddof=1 is</span>
@@ -2919,8 +2896,8 @@
 <span class="sd">        Calculate the Akaike Information Criterion (AIC) for the model.</span>
 
 <span class="sd">        :return: The Akaike Information Criterion (AIC) for the model.</span>
-<span class="sd">        :raises: AttributeError if the log-likelihood is not available.</span>
 
+<span class="sd">        :raises AttributeError: if the log-likelihood is not available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">llf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Log-likelihood is not available.&quot;</span><span class="p">)</span>
@@ -2932,12 +2909,13 @@
 <span class="sd">        Calculate the Bayesian Information Criterion (BIC) for the model.</span>
 
 <span class="sd">        :return: The Bayesian Information Criterion (BIC) for the model.</span>
-<span class="sd">        :raises: AttributeError if the log-likelihood is not available.</span>
-<span class="sd">        :raises: AttributeError if the input data matrix X is not available.</span>
 
+<span class="sd">        :raises AttributeError: if the log-likelihood or X is not available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">llf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Log-likelihood is not available.&quot;</span>
-        <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Input data matrix X is not available.&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">llf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Log-likelihood is not available.&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Input data matrix X is not available.&quot;</span><span class="p">)</span>
         <span class="c1"># BIC = plog(n) − 2log(L)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_params</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">llf</span>
 
@@ -2946,10 +2924,10 @@
 <span class="sd">        Make predictions using the generalized logistic model.</span>
 
 <span class="sd">        :param X: Input data matrix</span>
-<span class="sd">        :type X: np.ndarray</span>
+
 <span class="sd">        :return: Predictions based on the learned model parameters</span>
-<span class="sd">        :rtype: np.ndarray</span>
-<span class="sd">        :raises: ValueError if the model has not been fitted.</span>
+
+<span class="sd">        :raises ValueError: if the model has not been fitted.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">right_asymptote</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_asymptote</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -2970,9 +2948,7 @@
 
 <span class="sd">        :param X: The input data matrix. Must be two dimensional even if there is only</span>
 <span class="sd">            one predictor.</span>
-<span class="sd">        :type X: np.ndarray</span>
 <span class="sd">        :param y: The observed output data.</span>
-<span class="sd">        :type y: np.ndarray</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
@@ -2980,8 +2956,11 @@
 
     <span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Fit the model to the data :param kwargs: Additional keyword arguments. These</span>
-<span class="sd">        include:</span>
+<span class="sd">        Fit the model to the data. This uses `scipy.optimize.curve_fit` to optimize the</span>
+<span class="sd">        model parameters. See</span>
+<span class="sd">        https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html</span>
+
+<span class="sd">        :param kwargs: Additional keyword arguments to pass to `curve_fit`.</span>
 
 <span class="sd">        - **right_asymptote**: Initial guess for the upper asymptote.</span>
 <span class="sd">            Defaults to 1.0.</span>
@@ -2989,7 +2968,6 @@
 <span class="sd">            Defaults to 0.0.</span>
 <span class="sd">        - **coefficients**: Initial guess for the coefficients.</span>
 <span class="sd">        - Any other kwargs are passed on to `scipy.optimize.curve_fit`.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
 
         <span class="k">assert</span> <span class="p">(</span>
@@ -3038,10 +3016,12 @@
 
     <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Generate a summary of the model and diagnostic statistics.</span>
+<span class="sd">        Print a summary of the generalized logistic model.</span>
 
 <span class="sd">        This method automatically performs LRT comparisons between the full model and</span>
 <span class="sd">        models with one less predictor in each iteration.</span>
+
+<span class="sd">        :raises ValueError: if the model has not been fitted.</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -3154,7 +3134,6 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">plots_to_display</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
         <span class="n">interactor_diagnostic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Diagnostic plots for the generalized logistic model.</span>
@@ -3168,9 +3147,6 @@
 <span class="sd">            plots to show.</span>
 <span class="sd">        :param interactor_diagnostic: Boolean to include interactor diagnostic</span>
 <span class="sd">            plot (default False).</span>
-<span class="sd">        :param kwargs: Additional keyword arguments to pass to the plotting functions.</span>
-<span class="sd">            Currently passes arguments to the `InteractorDiagnosticPlot` class.</span>
-
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Model must be fitted before plotting diagnostics.&quot;</span><span class="p">)</span>
@@ -3255,7 +3231,6 @@
         <tr>
           <td><code>value</code></td>
           <td>
-                <code>np.ndarray</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -3282,11 +3257,54 @@
     <tbody>
         <tr>
           <td>
-                <code>np.ndarray</code>
           </td>
           <td>
             <div class="doc-md-description">
               <p>The input data matrix.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>TypeError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if X is not a NumPy array.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+                <code>ValueError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if X is not 2D.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+                <code>ValueError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the number of columns in X does not match the length of the inflection point or coefficients.</p>
             </div>
           </td>
         </tr>
@@ -3331,7 +3349,6 @@
         <tr>
           <td><code>value</code></td>
           <td>
-                <code>np.ndarray</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -3358,11 +3375,44 @@
     <tbody>
         <tr>
           <td>
-                <code>np.ndarray</code>
           </td>
           <td>
             <div class="doc-md-description">
               <p>The coefficients of the sigmoid function.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>TypeError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the coefficients are not a NumPy array or a list.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+                <code>ValueError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the length of the coefficients does not match the number of columns in X or the number of inflection points.</p>
             </div>
           </td>
         </tr>
@@ -3405,11 +3455,34 @@
     <tbody>
         <tr>
           <td>
-                <code>np.ndarray</code>
           </td>
           <td>
             <div class="doc-md-description">
               <p>The covariance matrix of the model parameters.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>TypeError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the covariance matrix is not a NumPy array.</p>
             </div>
           </td>
         </tr>
@@ -3451,11 +3524,34 @@
     <tbody>
         <tr>
           <td>
-                <code>int</code>
           </td>
           <td>
             <div class="doc-md-description">
               <p>The residual degrees of freedom of the model.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>AssertionError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the input data matrix X is not available.</p>
             </div>
           </td>
         </tr>
@@ -3497,11 +3593,34 @@
     <tbody>
         <tr>
           <td>
-                <code>np.ndarray</code>
           </td>
           <td>
             <div class="doc-md-description">
               <p>The Jacobian matrix of the model.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>TypeError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the Jacobian matrix is not a NumPy array.</p>
             </div>
           </td>
         </tr>
@@ -3544,11 +3663,44 @@
     <tbody>
         <tr>
           <td>
-                <code>float</code>
           </td>
           <td>
             <div class="doc-md-description">
               <p>The lower asymptote of the sigmoid function.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>TypeError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the lower asymptote is not a real number.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+                <code>ValueError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the lower asymptote is greater than the upper asymptote.</p>
             </div>
           </td>
         </tr>
@@ -3574,7 +3726,7 @@
 
   <div class="doc doc-contents ">
   
-      <p>The log-likelihood of the model.</p>
+      <p>The log-likelihood of the model. Note that this assumes Gaussian residuals.</p>
 
 
 
@@ -3589,11 +3741,34 @@
     <tbody>
         <tr>
           <td>
-                <code>float</code>
           </td>
           <td>
             <div class="doc-md-description">
               <p>The log-likelihood of the model.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>AttributeError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the residuals or y are not available.</p>
             </div>
           </td>
         </tr>
@@ -3634,11 +3809,34 @@
     <tbody>
         <tr>
           <td>
-                <code>float</code>
           </td>
           <td>
             <div class="doc-md-description">
               <p>The mean squared error of the model.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>AttributeError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the residuals are not available.</p>
             </div>
           </td>
         </tr>
@@ -3688,6 +3886,30 @@
         </tr>
     </tbody>
   </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>AttributeError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the coefficients are not available.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
   </div>
 
 </div>
@@ -3723,7 +3945,6 @@
     <tbody>
         <tr>
           <td>
-                <code>float</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -3747,11 +3968,11 @@
     <tbody>
         <tr>
           <td>
-                <code>AssertionError</code>
+                <code>AttributeError</code>
           </td>
           <td>
             <div class="doc-md-description">
-              <p>If the residuals are not available.</p>
+              <p><code>rss</code> or <code>tss</code> is not available</p>
             </div>
           </td>
         </tr>
@@ -3793,11 +4014,34 @@
     <tbody>
         <tr>
           <td>
-                <code>np.ndarray</code>
           </td>
           <td>
             <div class="doc-md-description">
               <p>The residuals of the model.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>TypeError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the residuals are not a NumPy array.</p>
             </div>
           </td>
         </tr>
@@ -3842,7 +4086,6 @@
         <tr>
           <td><code>value</code></td>
           <td>
-                <code>float</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -3869,11 +4112,44 @@
     <tbody>
         <tr>
           <td>
-                <code>float</code>
           </td>
           <td>
             <div class="doc-md-description">
               <p>The upper asymptote of the sigmoid function.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>TypeError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the upper asymptote is not a real number.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+                <code>ValueError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the upper asymptote is less than the lower asymptote.</p>
             </div>
           </td>
         </tr>
@@ -3914,11 +4190,34 @@
     <tbody>
         <tr>
           <td>
-                <code>float</code>
           </td>
           <td>
             <div class="doc-md-description">
               <p>The residual sum of squares of the model.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>AttributeError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the residuals are not available.</p>
             </div>
           </td>
         </tr>
@@ -3959,11 +4258,34 @@
     <tbody>
         <tr>
           <td>
-                <code>float</code>
           </td>
           <td>
             <div class="doc-md-description">
               <p>The total sum of squares of the model.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>AttributeError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the output data y is not available.</p>
             </div>
           </td>
         </tr>
@@ -4008,7 +4330,6 @@
         <tr>
           <td><code>value</code></td>
           <td>
-                <code>np.ndarray</code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -4035,11 +4356,44 @@
     <tbody>
         <tr>
           <td>
-                <code>np.ndarray</code>
           </td>
           <td>
             <div class="doc-md-description">
               <p>The observed output data.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>TypeError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if y is not a NumPy array or a list.</p>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td>
+                <code>ValueError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the number of rows in y does not match the number of rows in X.</p>
             </div>
           </td>
         </tr>
@@ -4064,21 +4418,25 @@
 
   <div class="doc doc-contents ">
   
-      <p>Generalized logistic function with an interactor term.</p>
+      <p>Initialize the generalized logistic model.</p>
 
           <details class="quote">
             <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">36</span>
-<span class="normal">37</span>
-<span class="normal">38</span>
-<span class="normal">39</span>
-<span class="normal">40</span>
-<span class="normal">41</span>
-<span class="normal">42</span>
-<span class="normal">43</span>
-<span class="normal">44</span>
-<span class="normal">45</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Generalized logistic function with an interactor term.&quot;&quot;&quot;</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">24</span>
+<span class="normal">25</span>
+<span class="normal">26</span>
+<span class="normal">27</span>
+<span class="normal">28</span>
+<span class="normal">29</span>
+<span class="normal">30</span>
+<span class="normal">31</span>
+<span class="normal">32</span>
+<span class="normal">33</span>
+<span class="normal">34</span>
+<span class="normal">35</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Initialize the generalized logistic model.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">_right_asymptote</span><span class="p">:</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span>
@@ -4132,26 +4490,50 @@
     </tbody>
   </table>
 
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>AttributeError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the log-likelihood is not available.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
           <details class="quote">
             <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">361</span>
-<span class="normal">362</span>
-<span class="normal">363</span>
-<span class="normal">364</span>
-<span class="normal">365</span>
-<span class="normal">366</span>
-<span class="normal">367</span>
-<span class="normal">368</span>
-<span class="normal">369</span>
-<span class="normal">370</span>
-<span class="normal">371</span>
-<span class="normal">372</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">aic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">351</span>
+<span class="normal">352</span>
+<span class="normal">353</span>
+<span class="normal">354</span>
+<span class="normal">355</span>
+<span class="normal">356</span>
+<span class="normal">357</span>
+<span class="normal">358</span>
+<span class="normal">359</span>
+<span class="normal">360</span>
+<span class="normal">361</span>
+<span class="normal">362</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">aic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the Akaike Information Criterion (AIC) for the model.</span>
 
 <span class="sd">    :return: The Akaike Information Criterion (AIC) for the model.</span>
-<span class="sd">    :raises: AttributeError if the log-likelihood is not available.</span>
 
+<span class="sd">    :raises AttributeError: if the log-likelihood is not available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">llf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Log-likelihood is not available.&quot;</span><span class="p">)</span>
@@ -4202,31 +4584,57 @@
     </tbody>
   </table>
 
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>AttributeError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the log-likelihood or X is not available.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
           <details class="quote">
             <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">374</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">364</span>
+<span class="normal">365</span>
+<span class="normal">366</span>
+<span class="normal">367</span>
+<span class="normal">368</span>
+<span class="normal">369</span>
+<span class="normal">370</span>
+<span class="normal">371</span>
+<span class="normal">372</span>
+<span class="normal">373</span>
+<span class="normal">374</span>
 <span class="normal">375</span>
 <span class="normal">376</span>
-<span class="normal">377</span>
-<span class="normal">378</span>
-<span class="normal">379</span>
-<span class="normal">380</span>
-<span class="normal">381</span>
-<span class="normal">382</span>
-<span class="normal">383</span>
-<span class="normal">384</span>
-<span class="normal">385</span>
-<span class="normal">386</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">bic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">377</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">bic</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Calculate the Bayesian Information Criterion (BIC) for the model.</span>
 
 <span class="sd">    :return: The Bayesian Information Criterion (BIC) for the model.</span>
-<span class="sd">    :raises: AttributeError if the log-likelihood is not available.</span>
-<span class="sd">    :raises: AttributeError if the input data matrix X is not available.</span>
 
+<span class="sd">    :raises AttributeError: if the log-likelihood or X is not available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">llf</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Log-likelihood is not available.&quot;</span>
-    <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;Input data matrix X is not available.&quot;</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">llf</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Log-likelihood is not available.&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="s2">&quot;Input data matrix X is not available.&quot;</span><span class="p">)</span>
     <span class="c1"># BIC = plog(n) − 2log(L)</span>
     <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">n_params</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">X</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">-</span> <span class="mi">2</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">llf</span>
 </code></pre></div></td></tr></table></div>
@@ -4248,20 +4656,53 @@
 
   <div class="doc doc-contents ">
   
-      <p>Fit the model to the data :param kwargs: Additional keyword arguments. These
-include:</p>
-<ul>
-<li><strong>right_asymptote</strong>: Initial guess for the upper asymptote.
-    Defaults to 1.0.</li>
-<li><strong>left_asymptote</strong>: Initial guess for the lower asymptote.
-    Defaults to 0.0.</li>
-<li><strong>coefficients</strong>: Initial guess for the coefficients.</li>
-<li>Any other kwargs are passed on to <code>scipy.optimize.curve_fit</code>.</li>
-</ul>
+      <p>Fit the model to the data. This uses <code>scipy.optimize.curve_fit</code> to optimize the
+model parameters. See
+https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html</p>
+
+
+
+  <p><strong>Parameters:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Type</th>
+        <th>Description</th>
+        <th>Default</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td><code>kwargs</code></td>
+          <td>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>Additional keyword arguments to pass to <code>curve_fit</code>.  - <strong>right_asymptote</strong>: Initial guess for the upper asymptote. Defaults to 1.0. - <strong>left_asymptote</strong>: Initial guess for the lower asymptote. Defaults to 0.0. - <strong>coefficients</strong>: Initial guess for the coefficients. - Any other kwargs are passed on to <code>scipy.optimize.curve_fit</code>.</p>
+            </div>
+          </td>
+          <td>
+                <code>{}</code>
+          </td>
+        </tr>
+    </tbody>
+  </table>
 
           <details class="quote">
             <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">425</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">414</span>
+<span class="normal">415</span>
+<span class="normal">416</span>
+<span class="normal">417</span>
+<span class="normal">418</span>
+<span class="normal">419</span>
+<span class="normal">420</span>
+<span class="normal">421</span>
+<span class="normal">422</span>
+<span class="normal">423</span>
+<span class="normal">424</span>
+<span class="normal">425</span>
 <span class="normal">426</span>
 <span class="normal">427</span>
 <span class="normal">428</span>
@@ -4308,19 +4749,13 @@ include:</p>
 <span class="normal">469</span>
 <span class="normal">470</span>
 <span class="normal">471</span>
-<span class="normal">472</span>
-<span class="normal">473</span>
-<span class="normal">474</span>
-<span class="normal">475</span>
-<span class="normal">476</span>
-<span class="normal">477</span>
-<span class="normal">478</span>
-<span class="normal">479</span>
-<span class="normal">480</span>
-<span class="normal">481</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">472</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">fit</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Fit the model to the data :param kwargs: Additional keyword arguments. These</span>
-<span class="sd">    include:</span>
+<span class="sd">    Fit the model to the data. This uses `scipy.optimize.curve_fit` to optimize the</span>
+<span class="sd">    model parameters. See</span>
+<span class="sd">    https://docs.scipy.org/doc/scipy/reference/generated/scipy.optimize.curve_fit.html</span>
+
+<span class="sd">    :param kwargs: Additional keyword arguments to pass to `curve_fit`.</span>
 
 <span class="sd">    - **right_asymptote**: Initial guess for the upper asymptote.</span>
 <span class="sd">        Defaults to 1.0.</span>
@@ -4328,7 +4763,6 @@ include:</p>
 <span class="sd">        Defaults to 0.0.</span>
 <span class="sd">    - **coefficients**: Initial guess for the coefficients.</span>
 <span class="sd">    - Any other kwargs are passed on to `scipy.optimize.curve_fit`.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">assert</span> <span class="p">(</span>
@@ -4441,27 +4875,23 @@ include:</p>
 
           <details class="quote">
             <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">411</span>
-<span class="normal">412</span>
-<span class="normal">413</span>
-<span class="normal">414</span>
-<span class="normal">415</span>
-<span class="normal">416</span>
-<span class="normal">417</span>
-<span class="normal">418</span>
-<span class="normal">419</span>
-<span class="normal">420</span>
-<span class="normal">421</span>
-<span class="normal">422</span>
-<span class="normal">423</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">402</span>
+<span class="normal">403</span>
+<span class="normal">404</span>
+<span class="normal">405</span>
+<span class="normal">406</span>
+<span class="normal">407</span>
+<span class="normal">408</span>
+<span class="normal">409</span>
+<span class="normal">410</span>
+<span class="normal">411</span>
+<span class="normal">412</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">model</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">y</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Set the predictor and response variables for the model.</span>
 
 <span class="sd">    :param X: The input data matrix. Must be two dimensional even if there is only</span>
 <span class="sd">        one predictor.</span>
-<span class="sd">    :type X: np.ndarray</span>
 <span class="sd">    :param y: The observed output data.</span>
-<span class="sd">    :type y: np.ndarray</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="o">=</span> <span class="n">y</span>
@@ -4478,7 +4908,7 @@ include:</p>
 
 
 <h3 id="yeastdnnexplorer.ml_models.GeneralizedLogisticModel.GeneralizedLogisticModel.plot" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">plot</span><span class="p">(</span><span class="n">plots_to_display</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">interactor_diagnostic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></code>
+          <code class="highlight language-python"><span class="n">plot</span><span class="p">(</span><span class="n">plots_to_display</span><span class="o">=</span><span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span> <span class="n">interactor_diagnostic</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span></code>
 
 <a href="#yeastdnnexplorer.ml_models.GeneralizedLogisticModel.GeneralizedLogisticModel.plot" class="headerlink" title="Permanent link">&para;</a></h3>
 
@@ -4533,25 +4963,19 @@ include:</p>
                 <code>False</code>
           </td>
         </tr>
-        <tr>
-          <td><code>kwargs</code></td>
-          <td>
-          </td>
-          <td>
-            <div class="doc-md-description">
-              <p>Additional keyword arguments to pass to the plotting functions. Currently passes arguments to the <code>InteractorDiagnosticPlot</code> class.</p>
-            </div>
-          </td>
-          <td>
-                <code>{}</code>
-          </td>
-        </tr>
     </tbody>
   </table>
 
           <details class="quote">
             <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">597</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">590</span>
+<span class="normal">591</span>
+<span class="normal">592</span>
+<span class="normal">593</span>
+<span class="normal">594</span>
+<span class="normal">595</span>
+<span class="normal">596</span>
+<span class="normal">597</span>
 <span class="normal">598</span>
 <span class="normal">599</span>
 <span class="normal">600</span>
@@ -4596,22 +5020,10 @@ include:</p>
 <span class="normal">639</span>
 <span class="normal">640</span>
 <span class="normal">641</span>
-<span class="normal">642</span>
-<span class="normal">643</span>
-<span class="normal">644</span>
-<span class="normal">645</span>
-<span class="normal">646</span>
-<span class="normal">647</span>
-<span class="normal">648</span>
-<span class="normal">649</span>
-<span class="normal">650</span>
-<span class="normal">651</span>
-<span class="normal">652</span>
-<span class="normal">653</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span>
+<span class="normal">642</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">plot</span><span class="p">(</span>
     <span class="bp">self</span><span class="p">,</span>
     <span class="n">plots_to_display</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">],</span>
     <span class="n">interactor_diagnostic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
 <span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Diagnostic plots for the generalized logistic model.</span>
@@ -4625,9 +5037,6 @@ include:</p>
 <span class="sd">        plots to show.</span>
 <span class="sd">    :param interactor_diagnostic: Boolean to include interactor diagnostic</span>
 <span class="sd">        plot (default False).</span>
-<span class="sd">    :param kwargs: Additional keyword arguments to pass to the plotting functions.</span>
-<span class="sd">        Currently passes arguments to the `InteractorDiagnosticPlot` class.</span>
-
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">residuals</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Model must be fitted before plotting diagnostics.&quot;</span><span class="p">)</span>
@@ -4728,7 +5137,7 @@ include:</p>
     <tbody>
         <tr>
           <td>
-                <code>np.ndarray</code>
+                <code><span title="numpy.ndarray">ndarray</span></code>
           </td>
           <td>
             <div class="doc-md-description">
@@ -4739,9 +5148,42 @@ include:</p>
     </tbody>
   </table>
 
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>ValueError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the model has not been fitted.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
           <details class="quote">
             <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">388</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">379</span>
+<span class="normal">380</span>
+<span class="normal">381</span>
+<span class="normal">382</span>
+<span class="normal">383</span>
+<span class="normal">384</span>
+<span class="normal">385</span>
+<span class="normal">386</span>
+<span class="normal">387</span>
+<span class="normal">388</span>
 <span class="normal">389</span>
 <span class="normal">390</span>
 <span class="normal">391</span>
@@ -4753,24 +5195,15 @@ include:</p>
 <span class="normal">397</span>
 <span class="normal">398</span>
 <span class="normal">399</span>
-<span class="normal">400</span>
-<span class="normal">401</span>
-<span class="normal">402</span>
-<span class="normal">403</span>
-<span class="normal">404</span>
-<span class="normal">405</span>
-<span class="normal">406</span>
-<span class="normal">407</span>
-<span class="normal">408</span>
-<span class="normal">409</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="normal">400</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">X</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Make predictions using the generalized logistic model.</span>
 
 <span class="sd">    :param X: Input data matrix</span>
-<span class="sd">    :type X: np.ndarray</span>
+
 <span class="sd">    :return: Predictions based on the learned model parameters</span>
-<span class="sd">    :rtype: np.ndarray</span>
-<span class="sd">    :raises: ValueError if the model has not been fitted.</span>
+
+<span class="sd">    :raises ValueError: if the model has not been fitted.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">right_asymptote</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">left_asymptote</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -4803,13 +5236,46 @@ include:</p>
 
   <div class="doc doc-contents ">
   
-      <p>Generate a summary of the model and diagnostic statistics.</p>
+      <p>Print a summary of the generalized logistic model.</p>
 <p>This method automatically performs LRT comparisons between the full model and
 models with one less predictor in each iteration.</p>
 
+
+
+  <p><strong>Raises:</strong></p>
+  <table>
+    <thead>
+      <tr>
+        <th>Type</th>
+        <th>Description</th>
+      </tr>
+    </thead>
+    <tbody>
+        <tr>
+          <td>
+                <code>ValueError</code>
+          </td>
+          <td>
+            <div class="doc-md-description">
+              <p>if the model has not been fitted.</p>
+            </div>
+          </td>
+        </tr>
+    </tbody>
+  </table>
+
           <details class="quote">
             <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">483</span>
+            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">474</span>
+<span class="normal">475</span>
+<span class="normal">476</span>
+<span class="normal">477</span>
+<span class="normal">478</span>
+<span class="normal">479</span>
+<span class="normal">480</span>
+<span class="normal">481</span>
+<span class="normal">482</span>
+<span class="normal">483</span>
 <span class="normal">484</span>
 <span class="normal">485</span>
 <span class="normal">486</span>
@@ -4914,19 +5380,14 @@ models with one less predictor in each iteration.</p>
 <span class="normal">585</span>
 <span class="normal">586</span>
 <span class="normal">587</span>
-<span class="normal">588</span>
-<span class="normal">589</span>
-<span class="normal">590</span>
-<span class="normal">591</span>
-<span class="normal">592</span>
-<span class="normal">593</span>
-<span class="normal">594</span>
-<span class="normal">595</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="normal">588</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Generate a summary of the model and diagnostic statistics.</span>
+<span class="sd">    Print a summary of the generalized logistic model.</span>
 
 <span class="sd">    This method automatically performs LRT comparisons between the full model and</span>
 <span class="sd">    models with one less predictor in each iteration.</span>
+
+<span class="sd">    :raises ValueError: if the model has not been fitted.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">X</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">y</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">coefficients</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -5049,74 +5510,6 @@ models with one less predictor in each iteration.</p>
 
 </div>
 
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h2 id="yeastdnnexplorer.ml_models.GeneralizedLogisticModel.calculate_nonlinear_leverage" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">calculate_nonlinear_leverage</span><span class="p">(</span><span class="n">J</span><span class="p">)</span></code>
-
-<a href="#yeastdnnexplorer.ml_models.GeneralizedLogisticModel.calculate_nonlinear_leverage" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Calculate leverage (hat matrix diagonal) from the Jacobian matrix.</p>
-
-          <details class="quote">
-            <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">19</span>
-<span class="normal">20</span>
-<span class="normal">21</span>
-<span class="normal">22</span>
-<span class="normal">23</span>
-<span class="normal">24</span>
-<span class="normal">25</span>
-<span class="normal">26</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">calculate_nonlinear_leverage</span><span class="p">(</span><span class="n">J</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate leverage (hat matrix diagonal) from the Jacobian matrix.&quot;&quot;&quot;</span>
-    <span class="c1"># (J^T J)^(-1) -- note that the transpose is reversed because of the format</span>
-    <span class="c1"># that it is output by curve_fit</span>
-    <span class="n">JTJ_inv</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">J</span><span class="p">,</span> <span class="n">J</span><span class="o">.</span><span class="n">T</span><span class="p">))</span>
-    <span class="n">H</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">J</span><span class="o">.</span><span class="n">T</span><span class="p">,</span> <span class="n">JTJ_inv</span><span class="p">),</span> <span class="n">J</span><span class="p">)</span>  <span class="c1"># H = J (J^T J)^(-1) J^T -- see note above</span>
-    <span class="n">leverage</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">diag</span><span class="p">(</span><span class="n">H</span><span class="p">)</span>  <span class="c1"># Extract diagonal elements</span>
-    <span class="k">return</span> <span class="n">leverage</span>
-</code></pre></div></td></tr></table></div>
-          </details>
-  </div>
-
-</div>
-
-
-<div class="doc doc-object doc-function">
-
-
-
-<h2 id="yeastdnnexplorer.ml_models.GeneralizedLogisticModel.cooks_distance" class="doc doc-heading">
-          <code class="highlight language-python"><span class="n">cooks_distance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="n">leverage</span><span class="p">,</span> <span class="n">mse</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span></code>
-
-<a href="#yeastdnnexplorer.ml_models.GeneralizedLogisticModel.cooks_distance" class="headerlink" title="Permanent link">&para;</a></h2>
-
-
-  <div class="doc doc-contents ">
-  
-      <p>Compute Cook&rsquo;s Distance using raw residuals.</p>
-
-          <details class="quote">
-            <summary>Source code in <code>yeastdnnexplorer/ml_models/GeneralizedLogisticModel.py</code></summary>
-            <div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">29</span>
-<span class="normal">30</span>
-<span class="normal">31</span>
-<span class="normal">32</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">def</span> <span class="nf">cooks_distance</span><span class="p">(</span><span class="n">residuals</span><span class="p">,</span> <span class="n">leverage</span><span class="p">,</span> <span class="n">mse</span><span class="p">,</span> <span class="n">p</span><span class="p">):</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Compute Cook&#39;s Distance using raw residuals.&quot;&quot;&quot;</span>
-    <span class="n">cooks_d</span> <span class="o">=</span> <span class="p">(</span><span class="n">residuals</span><span class="o">**</span><span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="n">p</span> <span class="o">*</span> <span class="n">mse</span><span class="p">))</span> <span class="o">*</span> <span class="p">(</span><span class="n">leverage</span> <span class="o">/</span> <span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">leverage</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">cooks_d</span>
-</code></pre></div></td></tr></table></div>
-          </details>
-  </div>
-
-</div>
 
 
 
